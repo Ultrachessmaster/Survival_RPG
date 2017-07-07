@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 public static class Physics {
 	static List<HitBox> hitboxes = new List<HitBox> ();
-    static float dist = 15f;
+    static float dist = 20f;
 	public static void Update () {
         for(int i = hitboxes.Count - 1; i >= 0; i--)
         {
@@ -16,8 +16,6 @@ public static class Physics {
                 hitbox.UpdatePolygon();
                 continue;
             }
-            if (!hitbox.enabled || !hitbox.entity.enabled || hitbox.vel == Vector2.Zero)
-                continue;
             hitbox.UpdatePolygon();
             HitBox largeCol;
             Vector2 size = (hitbox.size * 2) + new Vector2(Math.Abs(hitbox.vel.X), Math.Abs(hitbox.vel.Y));
@@ -77,7 +75,7 @@ public static class Physics {
 		if (!c.enabled || c.trigger)
 			return false;
 		foreach (HitBox collider in hitboxes) {
-			if (!collider.enabled || !collider.entity.enabled || c == collider || collider.trigger)
+			if (!collider.enabled || c == collider || collider.trigger)
 				continue;
 			bool touching = collider.IsOverlapping (c);
 			if (touching)
@@ -90,7 +88,7 @@ public static class Physics {
 		if (!c.enabled || c.trigger)
 			return false;
 		foreach (HitBox collider in colls) {
-			if (!collider.enabled || !collider.entity.enabled || c == collider || collider.trigger || Vector2.Distance(collider.pos, c.pos) > dist)
+			if (!collider.enabled || c == collider || collider.trigger || Vector2.Distance(collider.pos, c.pos) > dist)
 				continue;
             if (collider.IsOverlapping(c))
                 return true;
@@ -102,7 +100,7 @@ public static class Physics {
 		if (!c.enabled)
 			return null;
 		foreach (HitBox collider in hitboxes) {
-			if (!collider.enabled || !collider.entity.enabled || c == collider || Vector2.Distance(collider.pos, c.pos) > dist)
+			if (!collider.enabled || c == collider || Vector2.Distance(collider.pos, c.pos) > dist)
 				continue;
 			if (collider.IsOverlapping (c)) {
 				return collider;
@@ -115,7 +113,7 @@ public static class Physics {
         if (!c.enabled)
             return null;
         foreach (HitBox collider in hitboxes) {
-            if (!collider.enabled || !collider.entity.enabled || c == collider || Vector2.Distance(collider.pos, c.pos) > dist)
+            if (!collider.enabled || c == collider || Vector2.Distance(collider.pos, c.pos) > dist)
                 continue;
             if ((collider.entity is T) && collider.IsOverlapping(c)) {
                 return collider;
@@ -130,7 +128,7 @@ public static class Physics {
 		List<HitBox> colList = new List<HitBox> ();
 		for(int i = 0; i < hitboxes.Count; i++) {
             var collider = hitboxes[i];
-			if (!collider.enabled || !collider.entity.enabled || c == collider || collider.trigger || Vector2.Distance(collider.pos, c.pos) > dist)
+			if (!collider.enabled || c == collider || collider.trigger || Vector2.Distance(collider.pos, c.pos) > dist)
 				continue;
 			if (collider.IsOverlapping(c))
 				colList.Add(collider);
@@ -144,10 +142,10 @@ public static class Physics {
         List<HitBox> colList = new List<HitBox>();
         foreach (HitBox collider in hitboxes) {
             if(triggers) {
-                if (!collider.enabled || !collider.entity.enabled || c == collider || !collider.trigger || Vector2.Distance(collider.pos, c.pos) > dist)
+                if (!collider.enabled || c == collider || !collider.trigger || Vector2.Distance(collider.pos, c.pos) > dist)
                     continue;
             } else {
-                if (!collider.enabled || !collider.entity.enabled || c == collider || collider.trigger || Vector2.Distance(collider.pos, c.pos) > dist)
+                if (!collider.enabled || c == collider || collider.trigger || Vector2.Distance(collider.pos, c.pos) > dist)
                     continue;
             }
             
@@ -162,7 +160,7 @@ public static class Physics {
 			return null;
 		List<HitBox> colList = new List<HitBox> ();
 		foreach (HitBox collider in hitboxes) {
-			if (!collider.enabled || !collider.entity.enabled || c == collider || Vector2.Distance(collider.pos, c.pos) > dist)
+			if (!collider.enabled || c == collider || Vector2.Distance(collider.pos, c.pos) > dist)
 				continue;
 			if (collider.IsOverlapping (c)) {
 				colList.Add(collider);
@@ -176,7 +174,7 @@ public static class Physics {
 			return null;
 		List<HitBox> colList = new List<HitBox> ();
 		foreach (HitBox collider in hitboxes) {
-			if (collider.layer == layer && c != collider && collider.enabled && collider.IsOverlapping (c) && Vector2.Distance(collider.pos, c.pos) > dist && !collider.entity.enabled) {
+			if (collider.layer == layer && c != collider && collider.enabled && collider.IsOverlapping (c) && Vector2.Distance(collider.pos, c.pos) > dist) {
 				colList.Add(collider);
 			}
 		}
@@ -187,7 +185,7 @@ public static class Physics {
 		if (!c.enabled)
 			return null;
 		foreach (HitBox collider in hitboxes) {
-			if (collider.layer == layer && c != collider && collider.enabled && collider.IsOverlapping (c) && Vector2.Distance(collider.pos, c.pos) > dist && !collider.entity.enabled) {
+			if (collider.layer == layer && c != collider && collider.enabled && collider.IsOverlapping (c) || Vector2.Distance(collider.pos, c.pos) > dist) {
 				return collider;
 			}
 		}
