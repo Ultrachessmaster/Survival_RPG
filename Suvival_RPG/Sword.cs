@@ -17,7 +17,7 @@ namespace Suvival_RPG {
             tex = SRPG.SpriteMap;
             hb = new HitBox(pos, new Vector2(Eng.pxlsize), this);
             hb.trigger = true;
-            Timer.AddTimer(() => enabled.Value = false, Player.WaitTime, enabled);
+            Timer.AddTimer(() => ERegistry.RemoveEntity(this), Player.WaitTime, this);
 
             Attack = 5f;
             Name = "Sword";

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System;
 using Microsoft.Xna.Framework;
 
-public class Polygon
+public struct Polygon
 {
 	public Vector2[] Points;
 	public Vector2[] Edges;

@@ -8,14 +8,14 @@ namespace Engine
         Action action;
         float time;
         float timepassed;
-        RefWrapper<bool> enabled;
+        Entity e;
 
-        public static void AddTimer(Action act, float time, RefWrapper<bool> enabled = null)
+        public static void AddTimer(Action act, float time, Entity e)
         {
             Timer t = new Timer();
             t.action = act;
             t.time = time;
-            t.enabled = enabled;
+            t.e = e;
             Eng.Timers.Add(t);
         }
 
@@ -24,7 +24,7 @@ namespace Engine
             timepassed += timepass;
             if (timepassed >= time)
             {
-                if(enabled == null || enabled.Value)
+                if(ERegistry.entities.Contains(e))
                     action.Invoke();
                 Eng.Timers.Remove(this);
             }

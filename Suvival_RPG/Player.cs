@@ -76,7 +76,7 @@ namespace Suvival_RPG {
                     ERegistry.AddEntity(s);
 
                     canmove = false;
-                    Timer.AddTimer(() => canmove = true, WaitTime, enabled);
+                    Timer.AddTimer(() => canmove = true, WaitTime, this);
                 }
             }
 
@@ -123,6 +123,13 @@ namespace Suvival_RPG {
             Camera.X = (int)pos.X - (7 * Eng.tilesize);
             Camera.Y = (int)pos.Y - (6 * Eng.tilesize);
 
+            foreach(Entity e in ERegistry.entities) {
+                if (Vector2.Distance(e.pos, pos) < 15 * Eng.tilesize)
+                    e.enabled = true;
+                else
+                    e.enabled = false;
+            }
+
             if(Input.IsKeyPressed(Keys.LeftControl) || Input.IsKeyPressed(Keys.RightControl)) {
                 SRPG.GameSt = GameState.Inventory;
             }
@@ -131,7 +138,7 @@ namespace Suvival_RPG {
         public void Damage( float damage ) {  
             if(!invincible) {
                 Health -= damage;
-                Timer.AddTimer(() => invincible = false, 0.8f, enabled);
+                Timer.AddTimer(() => invincible = false, 0.8f, this);
                 hit.Play(0.05f, 0f, 0f);
             }
             invincible = true;

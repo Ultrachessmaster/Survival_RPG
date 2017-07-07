@@ -8,30 +8,28 @@ namespace Engine {
     
 
     class ERegistry {
-        static private List<Entity> entities = new List<Entity>();
+        public static List<Entity> entities = new List<Entity>();
         public static int EntityCount { get { return entities.Count; } }
 
         public void Update(GameTime gameTime) {
             for (int i = entities.Count - 1; i >= 0; i--) {
                 var ent = entities[i];
-                if (ent.enabled.Value)
+                if (ent.enabled)
                     ent.Update(gameTime);
-                else
-                    entities.RemoveAt(i);
             }
         }
         public void PostUpdate(GameTime gameTime) {
             for (int i = entities.Count - 1; i >= 0; i--) {
                 var ent = entities[i];
-                if (ent.enabled.Value)
+                if (ent.enabled)
                     ent.PostUpdate();
-                else
-                    entities.RemoveAt(i);
             }
         }
         public void Draw(SpriteBatch sb, int pxlratio, int tilesize, Color color) {
             for (int i = 0; i < entities.Count; i++) {
                 var ent = entities[i];
+                if (ent.enabled == false)
+                    continue;
                 ent.Draw(sb, pxlratio, tilesize, color);
             }
         }
@@ -56,7 +54,7 @@ namespace Engine {
             entities.Add(e);
         }
         public static void RemoveEntity(Entity e) {
-            e.enabled.Value = false;
+            e.enabled = false;
             entities.Remove(e);
         }
         public static void AddRangeE(List<Entity> e) {

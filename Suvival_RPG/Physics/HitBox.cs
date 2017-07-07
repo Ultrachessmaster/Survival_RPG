@@ -2,6 +2,7 @@
 using System;
 using Microsoft.Xna.Framework;
 using Engine;
+using System.Diagnostics;
 
 public class HitBox {
 	public Vector2 size = Vector2.One;
@@ -63,16 +64,18 @@ public class HitBox {
 
 	// Calculate the projection of a polygon on an axis
 	// and returns it as a [min, max] interval
+    
 	void ProjectPolygon(Vector2 axis, Polygon polygon, 
 		ref float min, ref float max) {
-		// To project a point on an axis use the dot product
-
-		float dotProduct = Vector2.Dot (axis, polygon.Points [0]);
+        // To project a point on an axis use the dot product
+        Stopwatch sw = new Stopwatch();
+        sw.Start();
+        float dotProduct = axis.X * polygon.Points[0].X + axis.Y * polygon.Points[0].Y;
 		min = dotProduct;
 		max = dotProduct;
 		for (int i = 0; i < polygon.Points.Length; i++) {
-			dotProduct = Vector2.Dot (polygon.Points[i], axis);
-			if (dotProduct < min) {
+            dotProduct = axis.X * polygon.Points[i].X + axis.Y * polygon.Points[i].Y;
+            if (dotProduct < min) {
 				min = dotProduct;
 			} else {
 				if (dotProduct > max) {
@@ -80,7 +83,13 @@ public class HitBox {
 				}
 			}
 		}
-	}
+        sw.Stop();
+        TimeSpan ts = sw.Elapsed;
+        string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+            ts.Hours, ts.Minutes, ts.Seconds,
+            ts.Milliseconds / 10);
+        Suvival_RPG.SRPG.times++;
+    }
 
 	float IntervalDistance(float minA, float maxA, float minB, float maxB) {
 		if (minA < minB) {

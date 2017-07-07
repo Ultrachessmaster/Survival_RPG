@@ -56,6 +56,7 @@ namespace Suvival_RPG {
         protected override void UnloadContent() {
             
         }
+        public static int times = 0;
         protected override void Update(GameTime gameTime) {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();

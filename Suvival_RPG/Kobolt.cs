@@ -53,7 +53,7 @@ namespace Suvival_RPG {
             if(!invincible) {
                 Health -= damage;
 
-                Timer.AddTimer(() => invincible = false, 0.5f, enabled);
+                Timer.AddTimer(() => invincible = false, 0.5f, this);
             }
             invincible = true;
         }

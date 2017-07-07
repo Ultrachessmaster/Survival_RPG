@@ -22,7 +22,7 @@ namespace Engine
         public Vector2 pos;
         public Vector2 scale = new Vector2(1, 1);
         public float rotation = 0f;
-        public RefWrapper<bool> enabled = new RefWrapper<bool>(true);
+        public bool enabled = true;
         
         public string Tag { get { return tag; } }
         protected string tag = "";
@@ -38,7 +38,7 @@ namespace Engine
 
         public virtual void Draw (SpriteBatch sb, int pxlratio, int tilesize, Color col)
         {
-            if (enabled.Value && visible)
+            if (enabled && visible)
             {
                 int xsource = (Sprite % (tex.Width / tilesize)) * tilesize;
                 int ysource = (int)Math.Floor((decimal)(Sprite) / (tex.Height / tilesize)) * tilesize;
