@@ -22,7 +22,8 @@ namespace Suvival_RPG {
 
         public static List<Text> Texts = new List<Text>();
 
-        Area area = new Area();
+        Tilemap tm;
+        ERegistry er = new ERegistry();
 
         public static GameState GameSt = GameState.Normal;
 
@@ -38,8 +39,11 @@ namespace Suvival_RPG {
         }
 
         void SetUpGame() {
-            Area.AddEntity(new Player(Vector2.Zero));
-            Area.AddEntity(new Kobolt(new Vector2(5f * Eng.tilesize, 5f * Eng.tilesize)));
+            ERegistry.AddEntity(new Player(new Vector2(250 * Eng.tilesize, 250 * Eng.tilesize)));
+
+            Generator g = new Generator();
+            tm = g.GenerateFloor(500, 500);
+            ERegistry.AddRangeE(g.GenerateEnemies(tm));
         }
 
         protected override void LoadContent() {
@@ -59,13 +63,13 @@ namespace Suvival_RPG {
             //---Game Logic---//
             switch(GameSt) {
                 case GameState.Normal:
-                    area.Update(gameTime);
+                    er.Update(gameTime);
                     Physics.Update();
-                    area.PostUpdate(gameTime);
+                    er.PostUpdate(gameTime);
                     Eng.Update(gameTime);
                     break;
                 case GameState.Inventory:
-                    var player = (Player)Area.GetEntity<Player>();
+                    var player = (Player)ERegistry.GetEntity<Player>();
                     player.inventory.Update();
                     Input.Update();
                     break;
@@ -82,12 +86,13 @@ namespace Suvival_RPG {
             //---Drawing---//
             switch(GameSt) {
                 case GameState.Normal:
-                    area.Draw(spriteBatch, Eng.pxlsize, Eng.tilesize, Color.White);
-                    foreach (Text t in Texts)
-                        t.Draw(spriteBatch);
+                    tm.Draw(spriteBatch, TileMap);
+                    er.Draw(spriteBatch, Eng.pxlsize, Eng.tilesize, Color.White);
+                    foreach (Text text in Texts)
+                        text.Draw(spriteBatch);
                     break;
                 case GameState.Inventory:
-                    var player = (Player)Area.GetEntity<Player>();
+                    var player = (Player)ERegistry.GetEntity<Player>();
                     player.inventory.Draw(spriteBatch);
                     break;
             }

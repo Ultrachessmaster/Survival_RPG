@@ -3,6 +3,8 @@
     public interface ITile
     {
         Tile TileType { get; }
+        int textureX { get; }
+        int textureY { get; }
     }
     //TODO: Make new tile types
     interface ISolid : ITile { }
@@ -14,5 +16,8 @@
         {
             tileType = t;
         }
+
+        public int textureX { get { return 0; } }
+        public int textureY { get { return 0; } }
     }
 }

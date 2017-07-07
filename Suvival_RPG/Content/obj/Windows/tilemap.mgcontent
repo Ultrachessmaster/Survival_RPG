@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <SourceFile>C:/Users/oldro/Programming Projects/Suvival_RPG/Suvival_RPG/Content/tilemap.png</SourceFile>
-  <SourceTime>2017-05-21T16:24:37.5230198-06:00</SourceTime>
+  <SourceTime>2017-07-04T21:58:09.4123496-06:00</SourceTime>
   <DestFile>C:/Users/oldro/Programming Projects/Suvival_RPG/Suvival_RPG/Content/bin/Windows/tilemap.xnb</DestFile>
-  <DestTime>2017-05-21T16:25:34.3076008-06:00</DestTime>
+  <DestTime>2017-07-04T21:58:15.555028-06:00</DestTime>
   <Importer>TextureImporter</Importer>
   <ImporterTime>2016-03-30T00:36:08-06:00</ImporterTime>
   <Processor>TextureProcessor</Processor>

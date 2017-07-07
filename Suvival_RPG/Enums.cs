@@ -8,9 +8,6 @@ namespace Suvival_RPG {
     enum FoodType {
         Kobolt_Meat
     }
-    enum Tile {
-
-    }
     public enum GameState {
         Normal,
         Inventory

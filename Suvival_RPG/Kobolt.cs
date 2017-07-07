@@ -24,15 +24,15 @@ namespace Suvival_RPG {
         }
 
         public override void Update(GameTime gt) {
-            var player = Area.GetEntity<Player>();
+            var player = ERegistry.GetEntity<Player>();
             if(player != null && Vector2.Distance(player.pos, pos) < noticedistance && !invincible) {
                 var dir = player.pos - pos;
                 dir.Normalize();
                 hb.vel = dir * speed;
             }
             if (Health <= 0) {
-                Area.RemoveEntity(this);
-                Area.AddEntity(new Food(pos, FoodType.Kobolt_Meat));
+                ERegistry.RemoveEntity(this);
+                ERegistry.AddEntity(new Food(pos, FoodType.Kobolt_Meat));
 
                 Player.XP += 10;
             }

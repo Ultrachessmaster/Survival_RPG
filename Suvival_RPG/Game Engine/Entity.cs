@@ -16,8 +16,8 @@ namespace Engine
             set { sprite = value; }
         }
         private int sprite;
-        protected int width = 32;
-        protected int height = 32;
+        protected int width = 16;
+        protected int height = 16;
         
         public Vector2 pos;
         public Vector2 scale = new Vector2(1, 1);
@@ -45,8 +45,8 @@ namespace Engine
 
                 Rectangle sourcerect = new Rectangle(xsource, ysource, tilesize, tilesize);
                 
-                Rectangle destr = new Rectangle((int)Math.Round((pos.X - Camera.X) * pxlratio), (int)Math.Round((pos.Y - Camera.Y) * pxlratio), width * pxlratio, height * pxlratio);
-                sb.Draw(tex, destr, sourcerect, col, rotation, new Vector2((tilesize/2), (tilesize / 2)), SpriteEffects.None, 0f);
+                Rectangle destrect = new Rectangle((int)Math.Round((pos.X - Camera.X) * pxlratio), (int)Math.Round((pos.Y - Camera.Y) * pxlratio), width * pxlratio, height * pxlratio);
+                sb.Draw(tex, destrect, sourcerect, col, rotation, new Vector2((tilesize/2), (tilesize / 2)), SpriteEffects.None, 0f);
             }
         }
     }

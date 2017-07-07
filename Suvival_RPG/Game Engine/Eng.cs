@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 
 namespace Engine {
     public static class Eng {
-        public static int pxlsize = 2;
+        public static int pxlsize = 3;
         public static int tilesize = 16;
         public static List<Timer> Timers = new List<Timer>();
         public static void Update(GameTime gt) {

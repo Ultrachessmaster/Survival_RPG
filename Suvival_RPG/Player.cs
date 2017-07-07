@@ -73,7 +73,7 @@ namespace Suvival_RPG {
                     Sword s = new Sword(pos + swordoffset, gt);
                     var correctedoffset = new Vector2(swordoffset.X, -swordoffset.Y);
                     s.rotation = correctedoffset.Angle(-Vector2.UnitX);
-                    Area.AddEntity(s);
+                    ERegistry.AddEntity(s);
 
                     canmove = false;
                     Timer.AddTimer(() => canmove = true, WaitTime, enabled);
@@ -87,7 +87,7 @@ namespace Suvival_RPG {
                 Health -= 0.05f;
 
             if (Health <= 0)
-                Area.RemoveEntity(this);
+                ERegistry.RemoveEntity(this);
         }
 
         void GetItems() {
@@ -95,14 +95,14 @@ namespace Suvival_RPG {
             foreach(HitBox hit in foods) {
                 Food f = (Food)hit.entity;
                 inventory.AddFood(f);
-                Area.RemoveEntity(f);
+                ERegistry.RemoveEntity(f);
             }
 
             var weapons = Physics.GetCollisions<IWeapon>(hb, true);
             foreach (HitBox hit in weapons) {
                 IWeapon w = (IWeapon)hit.entity;
                 inventory.AddWeapon(w);
-                Area.RemoveEntity(hit.entity);
+                ERegistry.RemoveEntity(hit.entity);
             }
         }
 
@@ -120,6 +120,8 @@ namespace Suvival_RPG {
             hb.vel = Vector2.Zero;
             pos = hb.pos;
             UpdateText();
+            Camera.X = (int)pos.X - (7 * Eng.tilesize);
+            Camera.Y = (int)pos.Y - (6 * Eng.tilesize);
 
             if(Input.IsKeyPressed(Keys.LeftControl) || Input.IsKeyPressed(Keys.RightControl)) {
                 SRPG.GameSt = GameState.Inventory;

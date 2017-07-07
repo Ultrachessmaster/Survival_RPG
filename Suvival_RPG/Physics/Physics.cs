@@ -130,7 +130,7 @@ public static class Physics {
 			return null;
 		List<HitBox> colList = new List<HitBox> ();
 		foreach (HitBox collider in hitboxes) {
-			if (!collider.enabled || c == collider || collider.trigger)
+			if (!collider.enabled || c == collider || collider.trigger || Vector2.Distance(collider.pos, c.pos) < 15f)
 				continue;
 			if (collider.IsOverlapping(c))
 				colList.Add(collider);
