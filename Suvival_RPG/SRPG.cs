@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
-
+using Box2D.XNA;
 namespace Suvival_RPG {
     /// <summary>
     /// This is the main type for your game.
@@ -24,6 +24,7 @@ namespace Suvival_RPG {
 
         Tilemap tm;
         ERegistry er = new ERegistry();
+        public static World World;
 
         public static GameState GameSt = GameState.Normal;
 
@@ -39,6 +40,8 @@ namespace Suvival_RPG {
         }
 
         void SetUpGame() {
+            World = new World(Vector2.Zero, true);
+
             ERegistry.AddEntity(new Player(new Vector2(250 * Eng.tilesize, 250 * Eng.tilesize)));
 
             Generator g = new Generator();
@@ -60,12 +63,12 @@ namespace Suvival_RPG {
         protected override void Update(GameTime gameTime) {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-
             //---Game Logic---//
             switch(GameSt) {
                 case GameState.Normal:
                     er.Update(gameTime);
-                    Physics.Update();
+                    //Physics.Update();
+                    World.Step(1 / 60f, 6, 2);
                     er.PostUpdate(gameTime);
                     Eng.Update(gameTime);
                     break;

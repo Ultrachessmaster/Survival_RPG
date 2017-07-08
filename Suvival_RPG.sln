@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Suvival_RPG", "Suvival_RPG\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Priority Queue", "..\High-Speed-Priority-Queue-for-C-Sharp-master\Priority Queue\Priority Queue.csproj", "{1531C1EA-BD53-41D1-A34B-CFCDF79D2651}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Box2DXNA", "..\Box2DXNA\Box2DXNA\Box2DXNA.csproj", "{8ECAE02F-7EBA-4D4F-A683-6CE73354B4E4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +51,22 @@ Global
 		{1531C1EA-BD53-41D1-A34B-CFCDF79D2651}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1531C1EA-BD53-41D1-A34B-CFCDF79D2651}.Release|x86.ActiveCfg = Release|Any CPU
 		{1531C1EA-BD53-41D1-A34B-CFCDF79D2651}.Release|x86.Build.0 = Release|Any CPU
+		{8ECAE02F-7EBA-4D4F-A683-6CE73354B4E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8ECAE02F-7EBA-4D4F-A683-6CE73354B4E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8ECAE02F-7EBA-4D4F-A683-6CE73354B4E4}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8ECAE02F-7EBA-4D4F-A683-6CE73354B4E4}.Debug|x86.Build.0 = Debug|Any CPU
+		{8ECAE02F-7EBA-4D4F-A683-6CE73354B4E4}.Release 2.0|Any CPU.ActiveCfg = Release|Any CPU
+		{8ECAE02F-7EBA-4D4F-A683-6CE73354B4E4}.Release 2.0|Any CPU.Build.0 = Release|Any CPU
+		{8ECAE02F-7EBA-4D4F-A683-6CE73354B4E4}.Release 2.0|x86.ActiveCfg = Release|Any CPU
+		{8ECAE02F-7EBA-4D4F-A683-6CE73354B4E4}.Release 2.0|x86.Build.0 = Release|Any CPU
+		{8ECAE02F-7EBA-4D4F-A683-6CE73354B4E4}.Release 4.5|Any CPU.ActiveCfg = Release|Any CPU
+		{8ECAE02F-7EBA-4D4F-A683-6CE73354B4E4}.Release 4.5|Any CPU.Build.0 = Release|Any CPU
+		{8ECAE02F-7EBA-4D4F-A683-6CE73354B4E4}.Release 4.5|x86.ActiveCfg = Release|Any CPU
+		{8ECAE02F-7EBA-4D4F-A683-6CE73354B4E4}.Release 4.5|x86.Build.0 = Release|Any CPU
+		{8ECAE02F-7EBA-4D4F-A683-6CE73354B4E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8ECAE02F-7EBA-4D4F-A683-6CE73354B4E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8ECAE02F-7EBA-4D4F-A683-6CE73354B4E4}.Release|x86.ActiveCfg = Release|Any CPU
+		{8ECAE02F-7EBA-4D4F-A683-6CE73354B4E4}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

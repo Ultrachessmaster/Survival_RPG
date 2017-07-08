@@ -1,4 +1,5 @@
-﻿using Engine;
+﻿using Box2D.XNA;
+using Engine;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Input;
@@ -16,13 +17,13 @@ namespace Suvival_RPG {
         Text hungertext;
         Text XPtext;
 
+        Body body;
+
         public Inventory inventory = new Inventory();
 
         bool invincible = false;
 
-        float speed = 1.2f;
-
-        HitBox hb;
+        float speed = 2f;
 
         bool canmove = true;
         public const float WaitTime = 0.3f;
@@ -40,8 +41,7 @@ namespace Suvival_RPG {
             Health = 50;
             Hunger = 100;
 
-            hb = new HitBox(pos, new Vector2(Eng.tilesize), this);
-            Physics.AddCollider(hb);
+            body = BoxWrapper.CreateBox(Vector2.One / 4, Vector2.Zero, pos, this);
 
             hit = SRPG.CM.Load<SoundEffect>("hit audio 2");
 
@@ -57,16 +57,17 @@ namespace Suvival_RPG {
 
         public override void Update(GameTime gt) {
             if(canmove) {
+                var vel = body.GetLinearVelocity();
                 if (Input.IsKeyDown(Keys.Up))
-                    hb.vel.Y = -speed;
+                    vel.Y = -speed;
                 if (Input.IsKeyDown(Keys.Down))
-                    hb.vel.Y = speed;
+                    vel.Y = speed;
                 if (Input.IsKeyDown(Keys.Left))
-                    hb.vel.X = -speed;
+                    vel.X = -speed;
                 if (Input.IsKeyDown(Keys.Right))
-                    hb.vel.X = speed;
-
-                var offset = new Vector2(Math.Sign(hb.vel.X), Math.Sign(hb.vel.Y)) * Eng.tilesize;
+                    vel.X = speed;
+                body.SetLinearVelocity(vel);
+                var offset = new Vector2(Math.Sign(vel.X), Math.Sign(vel.Y)) * Eng.tilesize;
                 if (offset != Vector2.Zero)
                     swordoffset = offset;
                 if (Input.IsKeyPressed(Keys.Z)) {
@@ -91,7 +92,7 @@ namespace Suvival_RPG {
         }
 
         void GetItems() {
-            var foods = Physics.GetCollisions<Food>(hb, true);
+            /*var foods = Physics.GetCollisions<Food>(hb, true);
             foreach(HitBox hit in foods) {
                 Food f = (Food)hit.entity;
                 inventory.AddFood(f);
@@ -103,7 +104,7 @@ namespace Suvival_RPG {
                 IWeapon w = (IWeapon)hit.entity;
                 inventory.AddWeapon(w);
                 ERegistry.RemoveEntity(hit.entity);
-            }
+            }*/
         }
 
         void UpdateText() {
@@ -117,8 +118,8 @@ namespace Suvival_RPG {
         }
 
         public override void PostUpdate() {
-            hb.vel = Vector2.Zero;
-            pos = hb.pos;
+            body.SetLinearVelocity(Vector2.Zero);
+            pos = body.Position * Eng.tilesize;
             UpdateText();
             Camera.X = (int)pos.X - (7 * Eng.tilesize);
             Camera.Y = (int)pos.Y - (6 * Eng.tilesize);

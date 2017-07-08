@@ -1,4 +1,5 @@
-﻿using Engine;
+﻿using Box2D.XNA;
+using Engine;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
@@ -9,17 +10,16 @@ namespace Suvival_RPG {
         public float Health { get; private set; }
         bool invincible = false;
 
-        HitBox hb;
+        Body body;
 
         float noticedistance = 9f * Eng.tilesize;
-        float speed = 0.6f;
+        float speed = 1f;
 
         public Kobolt(Vector2 pos) {
             this.pos = pos;
             Sprite = 1;
             tex = SRPG.SpriteMap;
-            hb = new HitBox(pos, new Vector2(Eng.tilesize), this);
-            Physics.AddCollider(hb);
+            body = BoxWrapper.CreateBox(Vector2.One / 4, Vector2.Zero, pos, this);
             Health = 15f;
         }
 
@@ -28,7 +28,7 @@ namespace Suvival_RPG {
             if(player != null && Vector2.Distance(player.pos, pos) < noticedistance && !invincible) {
                 var dir = player.pos - pos;
                 dir.Normalize();
-                hb.vel = dir * speed;
+                body.SetLinearVelocity(dir * speed);
             }
             if (Health <= 0) {
                 ERegistry.RemoveEntity(this);
@@ -39,14 +39,13 @@ namespace Suvival_RPG {
         }
 
         public override void PostUpdate() {
-            var damagehb = new HitBox(hb.pos, hb.size + Vector2.One, this);
-            var playercol = Physics.GetCollision<Player>(damagehb);
-            if(playercol != null) {
-                var player = (Player)playercol.entity;
+            var playerbody = BoxWrapper.GetCollision<Player>(body);
+            if(playerbody != null) {
+                var player = (Player)playerbody.GetUserData();
                 player.Damage(5f);
             }
-            hb.vel = Vector2.Zero;
-            pos = hb.pos;
+            body.SetLinearVelocity(Vector2.Zero);
+            pos = body.Position * Eng.tilesize;
         }
 
         public void Damage(float damage) {

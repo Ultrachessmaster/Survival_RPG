@@ -31,3 +31,6 @@ C:\Users\oldro\Programming Projects\Suvival_RPG\Suvival_RPG\bin\Windows\x86\Debu
 C:\Users\oldro\Programming Projects\Suvival_RPG\Suvival_RPG\bin\Windows\x86\Debug\Content\spritemap.png
 C:\Users\oldro\Programming Projects\Suvival_RPG\Suvival_RPG\bin\Windows\x86\Debug\Content\tilemap.png
 C:\Users\oldro\Programming Projects\Suvival_RPG\Suvival_RPG\bin\Windows\x86\Debug\Content\font.xnb
+C:\Users\oldro\Programming Projects\Suvival_RPG\Suvival_RPG\bin\Windows\x86\Debug\Suvival_RPG.exe.config
+C:\Users\oldro\Programming Projects\Suvival_RPG\Suvival_RPG\bin\Windows\x86\Debug\Box2DXNA.dll
+C:\Users\oldro\Programming Projects\Suvival_RPG\Suvival_RPG\bin\Windows\x86\Debug\Box2DXNA.pdb
