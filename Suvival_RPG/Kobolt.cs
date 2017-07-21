@@ -1,4 +1,4 @@
-﻿using Box2D.XNA;
+﻿using FarseerPhysics.Dynamics;
 using Engine;
 using Microsoft.Xna.Framework;
 using System;
@@ -14,12 +14,11 @@ namespace Suvival_RPG {
 
         float noticedistance = 9f * Eng.tilesize;
         float speed = 1f;
-
         public Kobolt(Vector2 pos) {
             this.pos = pos;
             Sprite = 1;
             tex = SRPG.SpriteMap;
-            body = BoxWrapper.CreateBox(Vector2.One / 4, Vector2.Zero, pos, this);
+            body = FS.CreateBox(new Vector2(4f / Eng.tilesize, 10f / Eng.tilesize), Vector2.Zero, pos, this, BodyType.Dynamic);
             Health = 15f;
         }
 
@@ -28,33 +27,35 @@ namespace Suvival_RPG {
             if(player != null && Vector2.Distance(player.pos, pos) < noticedistance && !invincible) {
                 var dir = player.pos - pos;
                 dir.Normalize();
-                body.SetLinearVelocity(dir * speed);
+                body.LinearVelocity = dir * speed;
             }
             if (Health <= 0) {
                 ERegistry.RemoveEntity(this);
-                ERegistry.AddEntity(new Food(pos, FoodType.Kobolt_Meat));
+                SRPG.World.RemoveBody(body);
+                if(Rng.r.Next(0, 4) == 0)
+                    ERegistry.AddEntity(new Food(pos, FoodType.Kobolt_Meat));
 
                 Player.XP += 10;
             }
         }
 
         public override void PostUpdate() {
-            var playerbody = BoxWrapper.GetCollision<Player>(body);
+            body.LinearVelocity = Vector2.Zero;
+            pos = body.Position * Eng.tilesize;
+            var playerbody = FS.GetCollision<Player>(body);
             if(playerbody != null) {
-                var player = (Player)playerbody.GetUserData();
+                var player = (Player)playerbody.UserData;
                 player.Damage(5f);
             }
-            body.SetLinearVelocity(Vector2.Zero);
-            pos = body.Position * Eng.tilesize;
+            
         }
 
         public void Damage(float damage) {
             if(!invincible) {
                 Health -= damage;
-
+                invincible = true;
                 Timer.AddTimer(() => invincible = false, 0.5f, this);
             }
-            invincible = true;
         }
     }
 }

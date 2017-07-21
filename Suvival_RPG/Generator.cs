@@ -2,6 +2,7 @@
 using System;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
+using FarseerPhysics.Dynamics;
 
 namespace Suvival_RPG {
     class Generator {
@@ -9,11 +10,63 @@ namespace Suvival_RPG {
             
         }
 
-        public Tilemap GenerateFloor(int width, int height) {
-            Tilemap tm = new Tilemap(width, height);
-            XY prevexitglobal = new XY(width/2, width/2);
-            XY prevexitdirection = XY.Right;
-            int fails = 0;
+        public Tilemap GenerateFloor() {
+            const int pathsize = 20;
+            const int roommapsize = 41;
+            bool[,] roommap = new bool[roommapsize, roommapsize];
+            List<XY> mainpath = new List<XY>();
+            XY center = new XY(roommapsize / 2, roommapsize / 2);
+            roommap[center.X, center.Y] = true;
+            XY currentpos = center;
+            for (int i = 0; i < pathsize; i++) {
+                var nextdir = RandomDirection();
+                var nextpos = currentpos + nextdir;
+                if (!roommap[nextpos.X, nextpos.Y]) {
+                    roommap[nextpos.X, nextpos.Y] = true;
+                    mainpath.Add(nextpos);
+                    currentpos = nextpos;
+                } else if(!roommap[currentpos.X + 1, currentpos.Y]) {
+                    roommap[currentpos.X + 1, currentpos.Y] = true;
+                    XY pos = new XY(currentpos.X + 1, currentpos.Y);
+                    mainpath.Add(pos);
+                    currentpos = pos;
+                } else if(!roommap[currentpos.X - 1, currentpos.Y]) {
+                    roommap[currentpos.X - 1, currentpos.Y] = true;
+                    XY pos = new XY(currentpos.X - 1, currentpos.Y);
+                    mainpath.Add(pos);
+                    currentpos = pos;
+                } else if(!roommap[currentpos.X, currentpos.Y + 1]) {
+                    roommap[currentpos.X, currentpos.Y + 1] = true;
+                    XY pos = new XY(currentpos.X, currentpos.Y + 1);
+                    mainpath.Add(pos);
+                    currentpos = pos;
+                } else if(!roommap[currentpos.X, currentpos.Y - 1]) {
+                    roommap[currentpos.X, currentpos.Y - 1] = true;
+                    XY pos = new XY(currentpos.X, currentpos.Y - 1);
+                    mainpath.Add(pos);
+                    currentpos = pos;
+                } else {
+                    i = -1;
+                    currentpos = center;
+                    roommap = new bool[roommapsize, roommapsize];
+                    mainpath.Clear();
+                }
+            }
+
+            Tilemap tm = new Tilemap(roommapsize * Room.MaxRoomSize, roommapsize * Room.MaxRoomSize);
+            for (int i = 1; i < mainpath.Count; i++) {
+                Room r = new Room(mainpath[i] - mainpath[i - 1]);
+                for(int x = mainpath[i].X * Room.MaxRoomSize; x < (mainpath[i].X * Room.MaxRoomSize) + r.Width; x++) {
+                    for(int y = mainpath[i].Y * Room.MaxRoomSize; y < (mainpath[i].Y * Room.MaxRoomSize) + r.Height; y++) {
+                        tm[x, y] = r.tiles[x - (mainpath[i].X * Room.MaxRoomSize), y - (mainpath[i].Y * Room.MaxRoomSize)];
+                    }
+                }
+            }
+
+
+
+
+            /*int fails = 0;
             for(int i = 0; i < 20; i++) {
                 var roomfit = true;
                 Room r = new Room(prevexitdirection);
@@ -32,7 +85,7 @@ namespace Suvival_RPG {
                         i = -1;
                         tm = new Tilemap(width, height);
                         prevexitglobal = new XY(width / 2, width / 2);
-                        prevexitdirection = XY.Right;
+                        prevexitdirection = RandomDirection();
                     }
                     continue;
                 }
@@ -47,7 +100,34 @@ namespace Suvival_RPG {
                 prevexitdirection = r.exitdirection;
             }
 
+            for(int x = 0; x < tm.Width; x++) {
+                for (int y = 0; y < tm.Height; y++) {
+                    if (tm[x, y] is ISolid)
+                        FS.CreateBox(Vector2.One, new Vector2(8f, 8f), new Vector2(x * Eng.tilesize, y * Eng.tilesize), null, BodyType.Static);
+                }
+            }*/
+
             return tm;
+        }
+
+        public XY RandomDirection() {
+            int dir = Rng.r.Next(0, 4);
+            XY direction = XY.Zero;
+            switch (dir) {
+                case 0:
+                    direction = XY.Right;
+                    break;
+                case 1:
+                    direction = XY.Left;
+                    break;
+                case 2:
+                    direction = XY.Up;
+                    break;
+                case 3:
+                    direction = XY.Down;
+                    break;
+            }
+            return direction;
         }
 
         public List<Entity> GenerateEnemies(Tilemap tm) {
@@ -56,7 +136,7 @@ namespace Suvival_RPG {
                 for (int y = 0; y < tm.Height; y++) {
                     if (tm[x, y] is ISolid || tm[x, y] == null)
                         continue;
-                    if (Rng.r.Next(0, 15) == 0)
+                    if (Rng.r.Next(0, 20) == 0)
                         enemies.Add(new Kobolt(new Vector2(x * Eng.tilesize, y * Eng.tilesize)));
                 }
             }
@@ -69,13 +149,15 @@ namespace Suvival_RPG {
         public XY exitdirection;
         public XY exit;
 
+        public const int MaxRoomSize = 15;
+
         public int Width { get; private set; }
         public int Height { get; private set; }
         public ITile[,] tiles;
         public Room(XY entrydir) {
 
-            Width = Rng.r.Next(5, 15);
-            Height = Rng.r.Next(5, 15);
+            Width = Rng.r.Next(5, MaxRoomSize);
+            Height = Rng.r.Next(5, MaxRoomSize);
             tiles = new ITile[Width, Height];
             for (int x = 0; x < Width; x++) {
                 for (int y = 0; y < Height; y++) {
@@ -88,14 +170,7 @@ namespace Suvival_RPG {
 
                 }
             }
-            int direction = Rng.r.Next(0, 4);
-            switch(direction) {
-                case 0: if (entrydir == XY.Right) direction = 3; break;
-                case 1: if (entrydir == XY.Left) direction = 2; break;
-                case 2: if (entrydir == XY.Up) direction = 0; break;
-                case 3: if (entrydir == XY.Down) direction = 1; break;
-            }
-            switch(direction) {
+            /*switch(direction) {
                 case 0://right
                     int exitrightY = Rng.r.Next(1, Height - 2);
                     tiles[Width - 1, exitrightY] = new DirtFloor();
@@ -120,25 +195,8 @@ namespace Suvival_RPG {
                     exitdirection = XY.Up;
                     exit = new XY(exitdownX, 0);
                     break;
-            }
-
-            if(entrydir == XY.Right) {
-                int entryY = Rng.r.Next(1, Height - 2);
-                tiles[Width - 1, entryY] = new DirtFloor();
-                entry = new XY(Width - 1, entryY);
-            } else if(entrydir == XY.Left) {
-                int entryY = Rng.r.Next(1, Height - 2);
-                tiles[0, entryY] = new DirtFloor();
-                entry = new XY(0, entryY);
-            } else if(entrydir == XY.Up) {
-                int entryX = Rng.r.Next(1, Width - 2);
-                tiles[entryX, Height - 1] = new DirtFloor();
-                entry = new XY(entryX, Height - 1);
-            } else if(entrydir == XY.Down) {
-                int entryX = Rng.r.Next(1, Width - 2);
-                tiles[entryX, 0] = new DirtFloor();
-                entry = new XY(entryX, 0);
-            }
+            }*/
+            
         }
 
     }

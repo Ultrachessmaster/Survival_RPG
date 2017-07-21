@@ -11,17 +11,12 @@ namespace Suvival_RPG {
         FoodType ft;
         public string Name;
         public float hunger_restore;
-        HitBox hb;
 
         public Food(Vector2 pos, FoodType ft) {
             this.pos = pos;
             this.ft = ft;
             tex = SRPG.SpriteMap;
             Sprite = 3 + (int)ft;
-
-            hb = new HitBox(pos, new Vector2(Eng.tilesize), this);
-            hb.trigger = true;
-            Physics.AddCollider(hb);
 
             switch(ft) {
                 case FoodType.Kobolt_Meat:

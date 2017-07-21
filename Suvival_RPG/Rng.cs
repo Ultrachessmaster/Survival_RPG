@@ -6,6 +6,6 @@ using System.Threading.Tasks;
 
 namespace Suvival_RPG {
     class Rng {
-        public static Random r = new Random(12345);
+        public static Random r = new Random();
     }
 }

@@ -5,7 +5,9 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
-using Box2D.XNA;
+using FarseerPhysics.Dynamics;
+using Microsoft.Xna.Framework.Media;
+
 namespace Suvival_RPG {
     /// <summary>
     /// This is the main type for your game.
@@ -40,19 +42,23 @@ namespace Suvival_RPG {
         }
 
         void SetUpGame() {
-            World = new World(Vector2.Zero, true);
-
-            ERegistry.AddEntity(new Player(new Vector2(250 * Eng.tilesize, 250 * Eng.tilesize)));
+            World = new World(Vector2.Zero);
 
             Generator g = new Generator();
-            tm = g.GenerateFloor(500, 500);
-            ERegistry.AddRangeE(g.GenerateEnemies(tm));
+            tm = g.GenerateFloor();
+            //ERegistry.AddEntity(new Player(new Vector2((tm.Width / 2) * Eng.tilesize, (tm.Height / 2) * Eng.tilesize)));
+            //ERegistry.AddRangeE(g.GenerateEnemies(tm));
         }
 
         protected override void LoadContent() {
             SpriteMap = Content.Load<Texture2D>("spritemap");
             TileMap = Content.Load<Texture2D>("tilemap");
             Arial = Content.Load<SpriteFont>("font");
+            var song = Content.Load<Song>("dungeon crawling");
+            MediaPlayer.Volume = 0.0f;//0.2f
+            MediaPlayer.IsRepeating = true;
+            MediaPlayer.Play(song);
+            
             spriteBatch = new SpriteBatch(GraphicsDevice);
             SetUpGame();
         }
@@ -67,8 +73,7 @@ namespace Suvival_RPG {
             switch(GameSt) {
                 case GameState.Normal:
                     er.Update(gameTime);
-                    //Physics.Update();
-                    World.Step(1 / 60f, 6, 2);
+                    World.Step(gameTime.ElapsedGameTime.Milliseconds * 0.001f);
                     er.PostUpdate(gameTime);
                     Eng.Update(gameTime);
                     break;
@@ -84,7 +89,7 @@ namespace Suvival_RPG {
             base.Update(gameTime);
         }
         protected override void Draw(GameTime gameTime) {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.Black);
             spriteBatch.Begin(samplerState: SamplerState.PointClamp, blendState: BlendState.NonPremultiplied);
 
             //---Drawing---//

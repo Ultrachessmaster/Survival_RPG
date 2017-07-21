@@ -1,10 +1,10 @@
-﻿using Box2D.XNA;
+﻿using FarseerPhysics.Dynamics;
 using Engine;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Input;
 using System;
-using System.Collections.Generic;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Suvival_RPG {
     class Player : Entity, IDamagable {
@@ -25,8 +25,10 @@ namespace Suvival_RPG {
 
         float speed = 2f;
 
-        bool canmove = true;
-        public const float WaitTime = 0.3f;
+        PlayerState ps = PlayerState.Normal;
+
+        public const float swordWaitTIme = 0.25f;
+        public const float rollTime = 0.125f;
 
         SoundEffect hit;
 
@@ -41,7 +43,7 @@ namespace Suvival_RPG {
             Health = 50;
             Hunger = 100;
 
-            body = BoxWrapper.CreateBox(Vector2.One / 4, Vector2.Zero, pos, this);
+            body = FS.CreateBox(new Vector2(4f / Eng.tilesize, 0.9f), Vector2.Zero, pos, this, BodyType.Dynamic);
 
             hit = SRPG.CM.Load<SoundEffect>("hit audio 2");
 
@@ -56,36 +58,46 @@ namespace Suvival_RPG {
         }
 
         public override void Update(GameTime gt) {
-            if(canmove) {
-                var vel = body.GetLinearVelocity();
-                if (Input.IsKeyDown(Keys.Up))
-                    vel.Y = -speed;
-                if (Input.IsKeyDown(Keys.Down))
-                    vel.Y = speed;
-                if (Input.IsKeyDown(Keys.Left))
-                    vel.X = -speed;
-                if (Input.IsKeyDown(Keys.Right))
-                    vel.X = speed;
-                body.SetLinearVelocity(vel);
-                var offset = new Vector2(Math.Sign(vel.X), Math.Sign(vel.Y)) * Eng.tilesize;
-                if (offset != Vector2.Zero)
-                    swordoffset = offset;
-                if (Input.IsKeyPressed(Keys.Z)) {
-                    Sword s = new Sword(pos + swordoffset, gt);
-                    var correctedoffset = new Vector2(swordoffset.X, -swordoffset.Y);
-                    s.rotation = correctedoffset.Angle(-Vector2.UnitX);
-                    ERegistry.AddEntity(s);
+            Assert.AreEqual(pos, body.Position * Eng.tilesize);
+            switch(ps) {
+                case PlayerState.Normal:
+                    var vel = body.LinearVelocity;
+                    if (Input.IsKeyDown(Keys.Up))
+                        vel.Y = -speed;
+                    if (Input.IsKeyDown(Keys.Down))
+                        vel.Y = speed;
+                    if (Input.IsKeyDown(Keys.Left))
+                        vel.X = -speed;
+                    if (Input.IsKeyDown(Keys.Right))
+                        vel.X = speed;
+                    body.LinearVelocity = vel;
+                    var offset = new Vector2(Math.Sign(vel.X), Math.Sign(vel.Y));
+                    if (offset != Vector2.Zero)
+                        swordoffset = offset * Eng.tilesize / 2;
+                    if(Input.IsKeyPressed(Keys.X)) {
+                        if(offset != Vector2.Zero) {
+                            ps = PlayerState.Rolling;
+                            body.LinearVelocity = body.LinearVelocity * 7;
+                            Timer.AddTimer(() => ps = PlayerState.Normal, rollTime, this);
+                        }
+                    }
+                    if (Input.IsKeyPressed(Keys.Z)) {
+                        var correctedoffset = new Vector2(swordoffset.X, -swordoffset.Y);
+                        Sword s = new Sword(pos + swordoffset, gt, correctedoffset.Angle(-Vector2.UnitX));
 
-                    canmove = false;
-                    Timer.AddTimer(() => canmove = true, WaitTime, this);
-                }
+                        ERegistry.AddEntity(s);
+
+                        ps = PlayerState.Frozen;
+                        Timer.AddTimer(() => ps = PlayerState.Normal, swordWaitTIme, this);
+                    }
+                    break;
             }
 
-            GetItems();
-            Hunger -= 0.015f;
+            //GetItems();
+            Hunger -= 0.0015f;
             Hunger = Math.Max(Hunger, 0);
             if (Hunger <= 0)
-                Health -= 0.05f;
+                Health -= 0.001f;
 
             if (Health <= 0)
                 ERegistry.RemoveEntity(this);
@@ -108,9 +120,9 @@ namespace Suvival_RPG {
         }
 
         void UpdateText() {
-            Vector2 textpos = pos + (new Vector2(-Eng.tilesize / 2, -Eng.tilesize * 1.5f));
-            XPtext.pos      = textpos - Vector2.UnitY * Eng.tilesize;
-            healthtext.pos  = textpos - Vector2.UnitY * Eng.tilesize / 2;
+            Vector2 textpos = (pos + (new Vector2(-Eng.tilesize / 2, -Eng.tilesize * 1.5f)));
+            XPtext.pos = textpos - Vector2.UnitY * Eng.tilesize;
+            healthtext.pos = textpos - Vector2.UnitY * Eng.tilesize / 2;
             hungertext.pos  = textpos;
             healthtext.text = "Health: " + Math.Round(Health);
             hungertext.text = "Hunger: " + Math.Round(Hunger);
@@ -118,17 +130,27 @@ namespace Suvival_RPG {
         }
 
         public override void PostUpdate() {
-            body.SetLinearVelocity(Vector2.Zero);
-            pos = body.Position * Eng.tilesize;
+            switch(ps) {
+                case PlayerState.Rolling:
+                    pos = body.Position * Eng.tilesize;
+                    break;
+                default:
+                    body.LinearVelocity = Vector2.Zero;
+                    pos = body.Position * Eng.tilesize;
+                    break;
+            }
             UpdateText();
             Camera.X = (int)pos.X - (7 * Eng.tilesize);
             Camera.Y = (int)pos.Y - (6 * Eng.tilesize);
 
             foreach(Entity e in ERegistry.entities) {
-                if (Vector2.Distance(e.pos, pos) < 15 * Eng.tilesize)
-                    e.enabled = true;
-                else
-                    e.enabled = false;
+                if (e is Kobolt) {
+                    if (Vector2.Distance(e.pos, pos) < 15 * Eng.tilesize)
+                        e.enabled = true;
+                    else
+                        e.enabled = false;
+                }
+                
             }
 
             if(Input.IsKeyPressed(Keys.LeftControl) || Input.IsKeyPressed(Keys.RightControl)) {
@@ -137,13 +159,12 @@ namespace Suvival_RPG {
         }
 
         public void Damage( float damage ) {  
-            if(!invincible) {
+            if(!invincible && ps != PlayerState.Rolling) {
                 Health -= damage;
+                invincible = true;
                 Timer.AddTimer(() => invincible = false, 0.8f, this);
-                hit.Play(0.05f, 0f, 0f);
+                hit.Play(0.1f, 0f, 0f);
             }
-            invincible = true;
-            
         }
     }
 }

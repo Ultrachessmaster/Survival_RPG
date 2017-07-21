@@ -152,9 +152,4 @@ public class HitBox {
 	public void Destroy() {
 		Physics.RemoveCollider (this);
 	}
-
-    public void SetEntityPos()
-    {
-        entity.pos = pos;
-    }
 }

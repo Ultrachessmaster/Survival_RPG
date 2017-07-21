@@ -39,6 +39,9 @@ namespace Engine {
         public static XY operator -(XY a, int b) {
             return new XY(a.X - b, a.Y - b);
         }
+        public static XY operator *(XY a, int b) {
+            return new XY(a.X * b, a.Y * b);
+        }
         public static XY Zero { get { return new XY(); } }
         public static XY Right { get { return new XY(1, 0); } }
         public static XY Left { get { return new XY(-1, 0); } }

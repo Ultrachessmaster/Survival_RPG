@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SourceFile>C:/Users/oldro/Programming Projects/Suvival_RPG/Suvival_RPG/Content/dungeon crawling.wav</SourceFile>
+  <SourceTime>2017-07-15T03:26:01.4052491-06:00</SourceTime>
+  <DestFile>C:/Users/oldro/Programming Projects/Suvival_RPG/Suvival_RPG/Content/bin/Windows/dungeon crawling.xnb</DestFile>
+  <DestTime>2017-07-15T03:36:06.4660466-06:00</DestTime>
+  <Importer>WavImporter</Importer>
+  <ImporterTime>2016-03-30T00:36:08-06:00</ImporterTime>
+  <Processor>SongProcessor</Processor>
+  <ProcessorTime>2016-03-30T00:36:08-06:00</ProcessorTime>
+  <Parameters>
+    <Key>Quality</Key>
+    <Value>Best</Value>
+  </Parameters>
+  <Dependencies />
+  <BuildAsset />
+  <BuildOutput>
+    <string>C:/Users/oldro/Programming Projects/Suvival_RPG/Suvival_RPG/Content/bin/Windows/dungeon crawling.wma</string>
+  </BuildOutput>
+</PipelineBuildEvent>

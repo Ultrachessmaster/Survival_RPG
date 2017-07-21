@@ -32,5 +32,8 @@ C:\Users\oldro\Programming Projects\Suvival_RPG\Suvival_RPG\bin\Windows\x86\Debu
 C:\Users\oldro\Programming Projects\Suvival_RPG\Suvival_RPG\bin\Windows\x86\Debug\Content\tilemap.png
 C:\Users\oldro\Programming Projects\Suvival_RPG\Suvival_RPG\bin\Windows\x86\Debug\Content\font.xnb
 C:\Users\oldro\Programming Projects\Suvival_RPG\Suvival_RPG\bin\Windows\x86\Debug\Suvival_RPG.exe.config
-C:\Users\oldro\Programming Projects\Suvival_RPG\Suvival_RPG\bin\Windows\x86\Debug\Box2DXNA.dll
-C:\Users\oldro\Programming Projects\Suvival_RPG\Suvival_RPG\bin\Windows\x86\Debug\Box2DXNA.pdb
+C:\Users\oldro\Programming Projects\Suvival_RPG\Suvival_RPG\bin\Windows\x86\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
+C:\Users\oldro\Programming Projects\Suvival_RPG\Suvival_RPG\bin\Windows\x86\Debug\Content\dungeon crawling.xnb
+C:\Users\oldro\Programming Projects\Suvival_RPG\Suvival_RPG\bin\Windows\x86\Debug\Content\dungeon crawling.wma
+C:\Users\oldro\Programming Projects\Suvival_RPG\Suvival_RPG\bin\Windows\x86\Debug\FarseerPhysics MonoGame.dll
+C:\Users\oldro\Programming Projects\Suvival_RPG\Suvival_RPG\bin\Windows\x86\Debug\FarseerPhysics MonoGame.pdb

@@ -12,4 +12,9 @@ namespace Suvival_RPG {
         Normal,
         Inventory
     }
+    public enum PlayerState {
+        Normal,
+        Rolling,
+        Frozen
+    }
 }

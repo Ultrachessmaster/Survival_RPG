@@ -49,3 +49,9 @@
 /processorParam:TextureFormat=Compressed
 /build:font.spritefont
 
+#begin dungeon crawling.wav
+/importer:WavImporter
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:dungeon crawling.wav
+

@@ -16,7 +16,8 @@ namespace Engine {
             this.col = col;
         }
         public void Draw(SpriteBatch sb) {
-            sb.DrawString(spritefont, text, pos * Eng.pxlsize, col);
+            Vector2 renderpos = new Vector2((int)Math.Round((pos.X - Camera.X) * Eng.pxlsize), (int)Math.Round((pos.Y - Camera.Y) * Eng.pxlsize));
+            sb.DrawString(spritefont, text, renderpos, col);
         }
     }
 }

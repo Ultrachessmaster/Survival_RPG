@@ -10,7 +10,7 @@ namespace Suvival_RPG {
         public int textureY { get { return 0; } }
     }
 
-    struct DirtWall : ITile {
+    struct DirtWall : ISolid {
         public Tile TileType { get { return Tile.DIRT_WALL; } }
 
         public int textureX { get { return 1 * Eng.tilesize; } }
