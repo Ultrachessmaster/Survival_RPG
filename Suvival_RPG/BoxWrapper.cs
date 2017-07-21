@@ -24,7 +24,7 @@ namespace Suvival_RPG {
             body.CreateFixture(fd);
             body.SetUserData(e);
             return body;*/
-            Body body = BodyFactory.CreateRectangle(SRPG.World, size.X, size.Y, 1f, (pos + offset) / Eng.tilesize, e);
+            Body body = BodyFactory.CreateRectangle(SRPG.Wld, size.X, size.Y, 1f, (pos + offset) / Eng.tilesize, e);
             body.BodyType = bt;
             body.Friction = 0.3f;
             body.IsSensor = sensor;

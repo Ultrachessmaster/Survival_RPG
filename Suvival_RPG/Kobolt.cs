@@ -10,12 +10,15 @@ namespace Suvival_RPG {
         public float Health { get; private set; }
         bool invincible = false;
 
-        Body body;
+        public Body body;
 
         float noticedistance = 9f * Eng.tilesize;
         float speed = 1f;
         public Kobolt(Vector2 pos) {
             this.pos = pos;
+        }
+
+        public void Load() {
             Sprite = 1;
             tex = SRPG.SpriteMap;
             body = FS.CreateBox(new Vector2(4f / Eng.tilesize, 10f / Eng.tilesize), Vector2.Zero, pos, this, BodyType.Dynamic);
@@ -31,7 +34,7 @@ namespace Suvival_RPG {
             }
             if (Health <= 0) {
                 ERegistry.RemoveEntity(this);
-                SRPG.World.RemoveBody(body);
+                SRPG.Wld.RemoveBody(body);
                 if(Rng.r.Next(0, 4) == 0)
                     ERegistry.AddEntity(new Food(pos, FoodType.Kobolt_Meat));
 

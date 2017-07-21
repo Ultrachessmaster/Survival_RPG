@@ -145,10 +145,13 @@ namespace Suvival_RPG {
 
             foreach(Entity e in ERegistry.entities) {
                 if (e is Kobolt) {
-                    if (Vector2.Distance(e.pos, pos) < 15 * Eng.tilesize)
+                    if (Vector2.Distance(e.pos, pos) < 15 * Eng.tilesize) {
                         e.enabled = true;
-                    else
+                        (e as Kobolt).body.Enabled = true;
+                    } else {
                         e.enabled = false;
+                        (e as Kobolt).body.Enabled = false;
+                    }
                 }
                 
             }

@@ -26,7 +26,7 @@ namespace Suvival_RPG {
 
         Tilemap tm;
         ERegistry er = new ERegistry();
-        public static World World;
+        public static World Wld;
 
         public static GameState GameSt = GameState.Normal;
 
@@ -42,12 +42,10 @@ namespace Suvival_RPG {
         }
 
         void SetUpGame() {
-            World = new World(Vector2.Zero);
+            Wld = new World(Vector2.Zero);
 
             Generator g = new Generator();
             tm = g.GenerateFloor();
-            //ERegistry.AddEntity(new Player(new Vector2((tm.Width / 2) * Eng.tilesize, (tm.Height / 2) * Eng.tilesize)));
-            //ERegistry.AddRangeE(g.GenerateEnemies(tm));
         }
 
         protected override void LoadContent() {
@@ -73,7 +71,7 @@ namespace Suvival_RPG {
             switch(GameSt) {
                 case GameState.Normal:
                     er.Update(gameTime);
-                    World.Step(gameTime.ElapsedGameTime.Milliseconds * 0.001f);
+                    Wld.Step(gameTime.ElapsedGameTime.Milliseconds * 0.001f);
                     er.PostUpdate(gameTime);
                     Eng.Update(gameTime);
                     break;

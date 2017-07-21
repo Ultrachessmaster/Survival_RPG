@@ -11,62 +11,13 @@ namespace Suvival_RPG {
         }
 
         public Tilemap GenerateFloor() {
-            const int pathsize = 20;
-            const int roommapsize = 41;
-            bool[,] roommap = new bool[roommapsize, roommapsize];
-            List<XY> mainpath = new List<XY>();
-            XY center = new XY(roommapsize / 2, roommapsize / 2);
-            roommap[center.X, center.Y] = true;
-            XY currentpos = center;
-            for (int i = 0; i < pathsize; i++) {
-                var nextdir = RandomDirection();
-                var nextpos = currentpos + nextdir;
-                if (!roommap[nextpos.X, nextpos.Y]) {
-                    roommap[nextpos.X, nextpos.Y] = true;
-                    mainpath.Add(nextpos);
-                    currentpos = nextpos;
-                } else if(!roommap[currentpos.X + 1, currentpos.Y]) {
-                    roommap[currentpos.X + 1, currentpos.Y] = true;
-                    XY pos = new XY(currentpos.X + 1, currentpos.Y);
-                    mainpath.Add(pos);
-                    currentpos = pos;
-                } else if(!roommap[currentpos.X - 1, currentpos.Y]) {
-                    roommap[currentpos.X - 1, currentpos.Y] = true;
-                    XY pos = new XY(currentpos.X - 1, currentpos.Y);
-                    mainpath.Add(pos);
-                    currentpos = pos;
-                } else if(!roommap[currentpos.X, currentpos.Y + 1]) {
-                    roommap[currentpos.X, currentpos.Y + 1] = true;
-                    XY pos = new XY(currentpos.X, currentpos.Y + 1);
-                    mainpath.Add(pos);
-                    currentpos = pos;
-                } else if(!roommap[currentpos.X, currentpos.Y - 1]) {
-                    roommap[currentpos.X, currentpos.Y - 1] = true;
-                    XY pos = new XY(currentpos.X, currentpos.Y - 1);
-                    mainpath.Add(pos);
-                    currentpos = pos;
-                } else {
-                    i = -1;
-                    currentpos = center;
-                    roommap = new bool[roommapsize, roommapsize];
-                    mainpath.Clear();
-                }
-            }
-
+            var roommapsize = 21;
             Tilemap tm = new Tilemap(roommapsize * Room.MaxRoomSize, roommapsize * Room.MaxRoomSize);
-            for (int i = 1; i < mainpath.Count; i++) {
-                Room r = new Room(mainpath[i] - mainpath[i - 1]);
-                for(int x = mainpath[i].X * Room.MaxRoomSize; x < (mainpath[i].X * Room.MaxRoomSize) + r.Width; x++) {
-                    for(int y = mainpath[i].Y * Room.MaxRoomSize; y < (mainpath[i].Y * Room.MaxRoomSize) + r.Height; y++) {
-                        tm[x, y] = r.tiles[x - (mainpath[i].X * Room.MaxRoomSize), y - (mainpath[i].Y * Room.MaxRoomSize)];
-                    }
-                }
-            }
 
-
-
-
-            /*int fails = 0;
+            var prevexitglobal = new XY(roommapsize * Room.MaxRoomSize / 2, roommapsize * Room.MaxRoomSize / 2);
+            var prevexitdirection = RandomDirection();
+            var rooms = new List<Room>();
+            int fails = 0;
             for(int i = 0; i < 20; i++) {
                 var roomfit = true;
                 Room r = new Room(prevexitdirection);
@@ -83,9 +34,10 @@ namespace Suvival_RPG {
                     if(fails >= 5) {
                         fails = 0;
                         i = -1;
-                        tm = new Tilemap(width, height);
-                        prevexitglobal = new XY(width / 2, width / 2);
+                        tm = new Tilemap(roommapsize * Room.MaxRoomSize, roommapsize * Room.MaxRoomSize);
+                        prevexitglobal = new XY(roommapsize * Room.MaxRoomSize / 2, roommapsize * Room.MaxRoomSize / 2);
                         prevexitdirection = RandomDirection();
+                        rooms.Clear();
                     }
                     continue;
                 }
@@ -94,23 +46,35 @@ namespace Suvival_RPG {
                         tm[x, y] = r.tiles[x - roombeg.X, y - roombeg.Y];
                     }
                 }
-                
+                foreach(Entity e in r.entities) {
+                    e.pos += new Vector2(roombeg.X * Eng.tilesize, roombeg.Y * Eng.tilesize);
+                    if(e is Kobolt) {
+                        (e as Kobolt).Load();
+                    }
+                }
+                rooms.Add(r);
 
                 prevexitglobal += (r.exit - r.entry);
                 prevexitdirection = r.exitdirection;
             }
 
+            foreach(Room r in rooms) {
+                ERegistry.AddRangeE(r.entities);
+            }
+
             for(int x = 0; x < tm.Width; x++) {
                 for (int y = 0; y < tm.Height; y++) {
-                    if (tm[x, y] is ISolid)
-                        FS.CreateBox(Vector2.One, new Vector2(8f, 8f), new Vector2(x * Eng.tilesize, y * Eng.tilesize), null, BodyType.Static);
+                    //if (tm[x, y] is ISolid)
+                        //FS.CreateBox(Vector2.One, new Vector2(8f, 8f), new Vector2(x * Eng.tilesize, y * Eng.tilesize), null, BodyType.Static);
                 }
-            }*/
+            }
+
+            ERegistry.AddEntity(new Player(new Vector2(roommapsize * Room.MaxRoomSize * Eng.tilesize / 2)));
 
             return tm;
         }
 
-        public XY RandomDirection() {
+        public static XY RandomDirection() {
             int dir = Rng.r.Next(0, 4);
             XY direction = XY.Zero;
             switch (dir) {
@@ -129,19 +93,6 @@ namespace Suvival_RPG {
             }
             return direction;
         }
-
-        public List<Entity> GenerateEnemies(Tilemap tm) {
-            List<Entity> enemies = new List<Entity>();
-            for (int x = 0; x < tm.Width; x++) {
-                for (int y = 0; y < tm.Height; y++) {
-                    if (tm[x, y] is ISolid || tm[x, y] == null)
-                        continue;
-                    if (Rng.r.Next(0, 20) == 0)
-                        enemies.Add(new Kobolt(new Vector2(x * Eng.tilesize, y * Eng.tilesize)));
-                }
-            }
-            return enemies;
-        }
     }
 
     class Room {
@@ -154,7 +105,9 @@ namespace Suvival_RPG {
         public int Width { get; private set; }
         public int Height { get; private set; }
         public ITile[,] tiles;
-        public Room(XY entrydir) {
+
+        public List<Entity> entities = new List<Entity>();
+        public Room(XY prevexitdir) {
 
             Width = Rng.r.Next(5, MaxRoomSize);
             Height = Rng.r.Next(5, MaxRoomSize);
@@ -163,40 +116,78 @@ namespace Suvival_RPG {
                 for (int y = 0; y < Height; y++) {
                     if (y == Height - 1 || y == 0 || x == Width - 1 || x == 0) {
                         tiles[x, y] = new DirtWall();
-                    }
-                    else {
+                    } else {
                         tiles[x, y] = new DirtFloor();
                     }
 
                 }
             }
-            /*switch(direction) {
-                case 0://right
-                    int exitrightY = Rng.r.Next(1, Height - 2);
-                    tiles[Width - 1, exitrightY] = new DirtFloor();
-                    exitdirection = XY.Left;
-                    exit = new XY(Width - 1, exitrightY);
-                    break;
-                case 1://left
-                    int exitleftY = Rng.r.Next(1, Height - 2);
-                    tiles[0, exitleftY] = new DirtFloor();
-                    exitdirection = XY.Right;
-                    exit = new XY(0, exitleftY);
-                    break;
-                case 2://up
-                    int exitupX = Rng.r.Next(1, Width - 2);
-                    tiles[exitupX, Height - 1] = new DirtFloor();
-                    exitdirection = XY.Down;
-                    exit = new XY(exitupX, Height - 1);
-                    break;
-                case 3://down
-                    int exitdownX = Rng.r.Next(1, Width - 2);
-                    tiles[exitdownX, 0] = new DirtFloor();
-                    exitdirection = XY.Up;
-                    exit = new XY(exitdownX, 0);
-                    break;
-            }*/
+
             
+
+            CreateEntrance(prevexitdir);
+            CreateExit();
+            PlaceEnemies();
+        }
+
+        void PlaceEnemies() {
+            for(int x = 1; x < Width - 1; x++) {
+                for(int y = 1; y < Height - 1; y++) {
+                    if (Rng.r.Next(0, 20) == 0) {
+                        Vector2 enemypos = new Vector2(x * Eng.tilesize, y * Eng.tilesize);
+                        entities.Add(new Kobolt(enemypos));
+                    }
+                        
+                }
+            }
+        }
+
+        void CreateEntrance(XY prevexitdir) {
+            if (prevexitdir == XY.Right) {
+                int entryrightY = Rng.r.Next(1, Height - 2);
+                tiles[0, entryrightY] = new DirtFloor();
+                entry = new XY(0, entryrightY);
+            }
+            else if (prevexitdir == XY.Left) {
+                int entryleftY = Rng.r.Next(1, Height - 2);
+                tiles[Width - 1, entryleftY] = new DirtFloor();
+                entry = new XY(Width - 1, entryleftY);
+            }
+            else if (prevexitdir == XY.Up) {
+                int entryupX = Rng.r.Next(1, Width - 2);
+                tiles[entryupX, 0] = new DirtFloor();
+                entry = new XY(entryupX, 0);
+            }
+            else if (prevexitdir == XY.Down) {
+                int entrydownX = Rng.r.Next(1, Width - 2);
+                tiles[entrydownX, Height - 1] = new DirtFloor();
+                entry = new XY(entrydownX, Height - 1);
+            }
+        }
+
+        void CreateExit() {
+            exitdirection = Generator.RandomDirection();
+
+            if (exitdirection == XY.Right) {
+                int exitrightY = Rng.r.Next(1, Height - 2);
+                tiles[Width - 1, exitrightY] = new DirtFloor();
+                exit = new XY(Width - 1, exitrightY);
+            }
+            else if (exitdirection == XY.Left) {
+                int exitleftY = Rng.r.Next(1, Height - 2);
+                tiles[0, exitleftY] = new DirtFloor();
+                exit = new XY(0, exitleftY);
+            }
+            else if (exitdirection == XY.Up) {
+                int exitupX = Rng.r.Next(1, Width - 2);
+                tiles[exitupX, Height - 1] = new DirtFloor();
+                exit = new XY(exitupX, Height - 1);
+            }
+            else if (exitdirection == XY.Down) {
+                int exitupX = Rng.r.Next(1, Width - 2);
+                tiles[exitupX, 0] = new DirtFloor();
+                exit = new XY(exitupX, 0);
+            }
         }
 
     }

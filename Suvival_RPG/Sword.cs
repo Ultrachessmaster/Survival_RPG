@@ -39,7 +39,7 @@ namespace Suvival_RPG {
 
         void DestroySelf() {
             ERegistry.RemoveEntity(this);
-            SRPG.World.RemoveBody(body);
+            SRPG.Wld.RemoveBody(body);
         }
     }
 }
