@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
-using FarseerPhysics.Dynamics;
-using FarseerPhysics.Factories;
 using Engine;
-using FarseerPhysics.Dynamics.Contacts;
 
 namespace Suvival_RPG {
-    class FS {
+    /*class FS {
         public static Body CreateBox(Vector2 size, Vector2 offset, Vector2 pos, Entity e, BodyType bt, bool sensor = false) {
-            /*BodyDef bd = new BodyDef();
+
+            BodyDef bd = new BodyDef();
             bd.type = bt;
             bd.position = (pos + offset) / Eng.tilesize;
             bd.fixedRotation = true;
@@ -23,7 +21,8 @@ namespace Suvival_RPG {
             fd.isSensor = sensor;
             body.CreateFixture(fd);
             body.SetUserData(e);
-            return body;*/
+            return body;
+
             Body body = BodyFactory.CreateRectangle(SRPG.Wld, size.X, size.Y, 1f, (pos + offset) / Eng.tilesize, e);
             body.BodyType = bt;
             body.Friction = 0.3f;
@@ -61,5 +60,5 @@ namespace Suvival_RPG {
             }
             return bodies;
         }
-    }
+    }*/
 }

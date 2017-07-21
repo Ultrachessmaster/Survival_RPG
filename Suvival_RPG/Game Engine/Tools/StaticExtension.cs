@@ -24,6 +24,8 @@ namespace Engine
 
         public static float Angle(this Vector2 a, Vector2 b)
         {
+            if (float.IsNaN(a.X))
+                return (float)Math.PI / 2f;
             var ysign = Math.Sign(a.Y);
             var angle = (float)Math.Acos((double)Vector2.Dot(a, b) / (a.Length() * b.Length()));
             return (ysign == -1 ? -angle

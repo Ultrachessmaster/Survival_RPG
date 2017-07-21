@@ -1,5 +1,4 @@
 ﻿using Engine;
-using FarseerPhysics.Dynamics;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
@@ -9,16 +8,16 @@ using System.Threading.Tasks;
 
 namespace Suvival_RPG {
     class ArrowTrap : Entity {
-        Body body;
+        HitBox body;
         float rate = 2f;
         public ArrowTrap(Vector2 pos, float rotation) {
             this.pos = pos;
             this.rotation = rotation;
             Sprite = 4;
             tex = SRPG.SpriteMap;
-            body = FS.CreateBox(Vector2.One, Vector2.Zero, pos, this, BodyType.Static);
+            body = new HitBox(pos, Vector2.One, this);
             this.rotation = rotation;
-            body.Rotation = rotation;
+            body.rotation = rotation;
             Timer.AddTimer(FireArrow, rate, this);
         }
 

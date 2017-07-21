@@ -19,7 +19,7 @@ namespace Engine
         protected int width = 16;
         protected int height = 16;
         
-        public Vector2 pos;
+        public virtual Vector2 pos { get; set; }
         public Vector2 scale = new Vector2(1, 1);
         public float rotation = 0f;
         public bool enabled = true;

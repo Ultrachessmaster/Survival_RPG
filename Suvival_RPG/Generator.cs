@@ -2,7 +2,6 @@
 using System;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
-using FarseerPhysics.Dynamics;
 
 namespace Suvival_RPG {
     class Generator {
@@ -46,30 +45,34 @@ namespace Suvival_RPG {
                         tm[x, y] = r.tiles[x - roombeg.X, y - roombeg.Y];
                     }
                 }
-                foreach(Entity e in r.entities) {
-                    e.pos += new Vector2(roombeg.X * Eng.tilesize, roombeg.Y * Eng.tilesize);
-                    if(e is Kobolt) {
-                        (e as Kobolt).Load();
-                    }
-                }
+
+                r.roombeg = roombeg;
                 rooms.Add(r);
 
                 prevexitglobal += (r.exit - r.entry);
                 prevexitdirection = r.exitdirection;
             }
 
-            foreach(Room r in rooms) {
+            ERegistry.AddEntity(new Player(new Vector2(roommapsize * Room.MaxRoomSize * Eng.tilesize / 2)));
+
+            foreach (Room r in rooms) {
+                r.PlaceEnemies();
+                foreach(Entity e in r.entities) {
+                    e.pos += new Vector2(r.roombeg.X * Eng.tilesize, r.roombeg.Y * Eng.tilesize);
+                }
                 ERegistry.AddRangeE(r.entities);
             }
 
             for(int x = 0; x < tm.Width; x++) {
                 for (int y = 0; y < tm.Height; y++) {
-                    //if (tm[x, y] is ISolid)
-                        //FS.CreateBox(Vector2.One, new Vector2(8f, 8f), new Vector2(x * Eng.tilesize, y * Eng.tilesize), null, BodyType.Static);
+                    if (tm[x, y] is ISolid) {
+                        HitBox hb = new HitBox(new Vector2(x * Eng.tilesize, y * Eng.tilesize), Vector2.One * Eng.tilesize, null);
+                        hb.kinematic = true;
+                        hb.offset = new Vector2(8f, 8f);
+                    }
+                        
                 }
             }
-
-            ERegistry.AddEntity(new Player(new Vector2(roommapsize * Room.MaxRoomSize * Eng.tilesize / 2)));
 
             return tm;
         }
@@ -100,6 +103,8 @@ namespace Suvival_RPG {
         public XY exitdirection;
         public XY exit;
 
+        public XY roombeg;
+
         public const int MaxRoomSize = 15;
 
         public int Width { get; private set; }
@@ -127,10 +132,9 @@ namespace Suvival_RPG {
 
             CreateEntrance(prevexitdir);
             CreateExit();
-            PlaceEnemies();
         }
 
-        void PlaceEnemies() {
+        public void PlaceEnemies() {
             for(int x = 1; x < Width - 1; x++) {
                 for(int y = 1; y < Height - 1; y++) {
                     if (Rng.r.Next(0, 20) == 0) {

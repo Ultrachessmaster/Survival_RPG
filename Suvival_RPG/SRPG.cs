@@ -5,7 +5,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
-using FarseerPhysics.Dynamics;
 using Microsoft.Xna.Framework.Media;
 
 namespace Suvival_RPG {
@@ -26,7 +25,6 @@ namespace Suvival_RPG {
 
         Tilemap tm;
         ERegistry er = new ERegistry();
-        public static World Wld;
 
         public static GameState GameSt = GameState.Normal;
 
@@ -42,8 +40,6 @@ namespace Suvival_RPG {
         }
 
         void SetUpGame() {
-            Wld = new World(Vector2.Zero);
-
             Generator g = new Generator();
             tm = g.GenerateFloor();
         }
@@ -71,7 +67,7 @@ namespace Suvival_RPG {
             switch(GameSt) {
                 case GameState.Normal:
                     er.Update(gameTime);
-                    Wld.Step(gameTime.ElapsedGameTime.Milliseconds * 0.001f);
+                    Physics.Update();
                     er.PostUpdate(gameTime);
                     Eng.Update(gameTime);
                     break;

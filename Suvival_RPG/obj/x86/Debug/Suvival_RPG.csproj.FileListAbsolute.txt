@@ -35,5 +35,3 @@ C:\Users\oldro\Programming Projects\Suvival_RPG\Suvival_RPG\bin\Windows\x86\Debu
 C:\Users\oldro\Programming Projects\Suvival_RPG\Suvival_RPG\bin\Windows\x86\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
 C:\Users\oldro\Programming Projects\Suvival_RPG\Suvival_RPG\bin\Windows\x86\Debug\Content\dungeon crawling.xnb
 C:\Users\oldro\Programming Projects\Suvival_RPG\Suvival_RPG\bin\Windows\x86\Debug\Content\dungeon crawling.wma
-C:\Users\oldro\Programming Projects\Suvival_RPG\Suvival_RPG\bin\Windows\x86\Debug\FarseerPhysics MonoGame.dll
-C:\Users\oldro\Programming Projects\Suvival_RPG\Suvival_RPG\bin\Windows\x86\Debug\FarseerPhysics MonoGame.pdb

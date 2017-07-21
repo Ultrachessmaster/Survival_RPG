@@ -1,5 +1,4 @@
-﻿using FarseerPhysics.Dynamics;
-using Engine;
+﻿using Engine;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Input;
@@ -17,7 +16,7 @@ namespace Suvival_RPG {
         Text hungertext;
         Text XPtext;
 
-        Body body;
+        HitBox hb;
 
         public Inventory inventory = new Inventory();
 
@@ -43,7 +42,7 @@ namespace Suvival_RPG {
             Health = 50;
             Hunger = 100;
 
-            body = FS.CreateBox(new Vector2(4f / Eng.tilesize, 0.9f), Vector2.Zero, pos, this, BodyType.Dynamic);
+            hb = new HitBox(pos, new Vector2(4f, 10f), this);
 
             hit = SRPG.CM.Load<SoundEffect>("hit audio 2");
 
@@ -58,10 +57,10 @@ namespace Suvival_RPG {
         }
 
         public override void Update(GameTime gt) {
-            Assert.AreEqual(pos, body.Position * Eng.tilesize);
+            Assert.AreEqual(pos, hb.pos);
             switch(ps) {
                 case PlayerState.Normal:
-                    var vel = body.LinearVelocity;
+                    var vel = hb.vel;
                     if (Input.IsKeyDown(Keys.Up))
                         vel.Y = -speed;
                     if (Input.IsKeyDown(Keys.Down))
@@ -70,14 +69,14 @@ namespace Suvival_RPG {
                         vel.X = -speed;
                     if (Input.IsKeyDown(Keys.Right))
                         vel.X = speed;
-                    body.LinearVelocity = vel;
+                    hb.vel = vel;
                     var offset = new Vector2(Math.Sign(vel.X), Math.Sign(vel.Y));
                     if (offset != Vector2.Zero)
                         swordoffset = offset * Eng.tilesize / 2;
                     if(Input.IsKeyPressed(Keys.X)) {
                         if(offset != Vector2.Zero) {
                             ps = PlayerState.Rolling;
-                            body.LinearVelocity = body.LinearVelocity * 7;
+                            hb.vel *= 7;
                             Timer.AddTimer(() => ps = PlayerState.Normal, rollTime, this);
                         }
                     }
@@ -132,11 +131,11 @@ namespace Suvival_RPG {
         public override void PostUpdate() {
             switch(ps) {
                 case PlayerState.Rolling:
-                    pos = body.Position * Eng.tilesize;
+                    pos = hb.pos;
                     break;
                 default:
-                    body.LinearVelocity = Vector2.Zero;
-                    pos = body.Position * Eng.tilesize;
+                    hb.vel = Vector2.Zero;
+                    pos = hb.pos;
                     break;
             }
             UpdateText();
@@ -147,10 +146,10 @@ namespace Suvival_RPG {
                 if (e is Kobolt) {
                     if (Vector2.Distance(e.pos, pos) < 15 * Eng.tilesize) {
                         e.enabled = true;
-                        (e as Kobolt).body.Enabled = true;
+                        (e as Kobolt).body.enabled = true;
                     } else {
                         e.enabled = false;
-                        (e as Kobolt).body.Enabled = false;
+                        (e as Kobolt).body.enabled = false;
                     }
                 }
                 
