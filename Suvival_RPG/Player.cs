@@ -22,7 +22,7 @@ namespace Suvival_RPG {
 
         bool invincible = false;
 
-        float speed = 2f;
+        float speed = 1f;
 
         PlayerState ps = PlayerState.Normal;
 

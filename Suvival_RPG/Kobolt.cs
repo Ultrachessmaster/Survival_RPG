@@ -23,7 +23,8 @@ namespace Suvival_RPG {
         public HitBox body;
 
         float noticedistance = 9f * Eng.tilesize;
-        float speed = 1f;
+        float speed = 0.5f;
+
         public Kobolt(Vector2 pos) {
             body = new HitBox(pos, new Vector2(4f, 10f), this);
             this.pos = pos;
@@ -52,7 +53,11 @@ namespace Suvival_RPG {
         public override void PostUpdate() {
             body.vel = Vector2.Zero;
             pos = body.pos;
+            body.size += new Vector2(2, 2);
+            body.UpdatePolygon();
             var playerbody = Physics.GetCollision<Player>(body);
+            body.size -= new Vector2(2, 2);
+            body.UpdatePolygon();
             if(playerbody != null) {
                 var player = (Player)playerbody.entity;
                 player.Damage(5f);

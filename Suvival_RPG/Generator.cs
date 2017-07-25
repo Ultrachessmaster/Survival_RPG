@@ -13,49 +13,12 @@ namespace Suvival_RPG {
             var roommapsize = 21;
             Tilemap tm = new Tilemap(roommapsize * Room.MaxRoomSize, roommapsize * Room.MaxRoomSize);
 
-            var prevexitglobal = new XY(roommapsize * Room.MaxRoomSize / 2, roommapsize * Room.MaxRoomSize / 2);
-            var prevexitdirection = RandomDirection();
-            var rooms = new List<Room>();
-            int fails = 0;
-            for(int i = 0; i < 20; i++) {
-                var roomfit = true;
-                Room r = new Room(prevexitdirection);
-                XY roombeg = prevexitglobal - r.entry;
-                for (int x = roombeg.X + 1; x < r.Width + roombeg.X - 1; x++) {
-                    for (int y = roombeg.Y + 1; y < r.Height + roombeg.Y - 1; y++) {
-                        if (tm[x, y] != null)
-                            roomfit = false;
-                    }
-                }
-                if(!roomfit) {
-                    fails++;
-                    i--;
-                    if(fails >= 5) {
-                        fails = 0;
-                        i = -1;
-                        tm = new Tilemap(roommapsize * Room.MaxRoomSize, roommapsize * Room.MaxRoomSize);
-                        prevexitglobal = new XY(roommapsize * Room.MaxRoomSize / 2, roommapsize * Room.MaxRoomSize / 2);
-                        prevexitdirection = RandomDirection();
-                        rooms.Clear();
-                    }
-                    continue;
-                }
-                for (int x = roombeg.X; x < r.Width + roombeg.X; x++) {
-                    for (int y = roombeg.Y; y < r.Height + roombeg.Y; y++) {
-                        tm[x, y] = r.tiles[x - roombeg.X, y - roombeg.Y];
-                    }
-                }
-
-                r.roombeg = roombeg;
-                rooms.Add(r);
-
-                prevexitglobal += (r.exit - r.entry);
-                prevexitdirection = r.exitdirection;
-            }
+            XY start = new XY(roommapsize * Room.MaxRoomSize / 2, roommapsize * Room.MaxRoomSize / 2);
+            var mainpath = MakePath(start, tm, 20);
 
             ERegistry.AddEntity(new Player(new Vector2(roommapsize * Room.MaxRoomSize * Eng.tilesize / 2)));
 
-            foreach (Room r in rooms) {
+            foreach (Room r in mainpath) {
                 r.PlaceEnemies();
                 foreach(Entity e in r.entities) {
                     e.pos += new Vector2(r.roombeg.X * Eng.tilesize, r.roombeg.Y * Eng.tilesize);
@@ -75,6 +38,50 @@ namespace Suvival_RPG {
             }
 
             return tm;
+        }
+
+        public List<Room> MakePath(XY start, Tilemap tm, int length) {
+            var prevexitglobal = start;
+            var prevexitdirection = RandomDirection();
+            var rooms = new List<Room>();
+            int fails = 0;
+            for (int i = 0; i < length; i++) {
+                var roomfit = true;
+                Room r = new Room(prevexitdirection);
+                XY roombeg = prevexitglobal - r.entry;
+                for (int x = roombeg.X + 1; x < r.Width + roombeg.X - 1; x++) {
+                    for (int y = roombeg.Y + 1; y < r.Height + roombeg.Y - 1; y++) {
+                        if (tm[x, y] != null)
+                            roomfit = false;
+                    }
+                }
+                if (!roomfit) {
+                    fails++;
+                    i--;
+                    if (fails >= 5) {
+                        fails = 0;
+                        i = -1;
+                        prevexitglobal = start;
+                        prevexitdirection = RandomDirection();
+                        tm = new Tilemap(tm.Width, tm.Height);
+                        rooms.Clear();
+                    }
+                    continue;
+                }
+
+                for (int x = roombeg.X; x < r.Width + roombeg.X; x++) {
+                    for (int y = roombeg.Y; y < r.Height + roombeg.Y; y++) {
+                        tm[x, y] = r.tiles[x - roombeg.X, y - roombeg.Y];
+                    }
+                }
+
+                r.roombeg = roombeg;
+                rooms.Add(r);
+
+                prevexitglobal += (r.exit - r.entry);
+                prevexitdirection = r.exitdirection;
+            }
+            return rooms;
         }
 
         public static XY RandomDirection() {

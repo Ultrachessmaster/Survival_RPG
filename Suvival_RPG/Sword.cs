@@ -26,13 +26,13 @@ namespace Suvival_RPG {
         }
 
         public override void PostUpdate() {
-            /*var damagecols = FS.GetCollisions<IDamagable>(body);
-            foreach(Body col in damagecols) {
-                var dmg = (IDamagable)col.UserData;
+            var damagecols = Physics.GetCollisions<IDamagable>(body);
+            foreach(HitBox col in damagecols) {
+                var dmg = (IDamagable)col.entity;
                 if(dmg is Player)
                     continue;
                 dmg.Damage(Attack);
-            }*/
+            }
 
         }
 
