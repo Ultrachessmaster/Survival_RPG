@@ -14,7 +14,7 @@ namespace Suvival_RPG {
     public class SRPG : Game {
 
         public static Texture2D SpriteMap { get; private set; }
-        public static Texture2D TileMap { get; private set; }
+        public static Texture2D tilemap { get; private set; }
 
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
@@ -23,8 +23,9 @@ namespace Suvival_RPG {
 
         public static List<Text> Texts = new List<Text>();
 
-        Tilemap tm;
-        ERegistry er = new ERegistry();
+        static Area area = new Area();
+        static List<Room> rooms;
+        public static int RoomID;
 
         public static GameState GameSt = GameState.Normal;
 
@@ -41,12 +42,14 @@ namespace Suvival_RPG {
 
         void SetUpGame() {
             Generator g = new Generator();
-            tm = g.GenerateFloor();
+            rooms = g.GenerateFloor();
+            RoomID = 0;
+            LoadRoom(RoomID);
         }
 
         protected override void LoadContent() {
             SpriteMap = Content.Load<Texture2D>("spritemap");
-            TileMap = Content.Load<Texture2D>("tilemap");
+            tilemap = Content.Load<Texture2D>("tilemap");
             Arial = Content.Load<SpriteFont>("font");
             var song = Content.Load<Song>("dungeon crawling");
             MediaPlayer.Volume = 0.0f;//0.2f
@@ -59,20 +62,19 @@ namespace Suvival_RPG {
         protected override void UnloadContent() {
             
         }
-        public static int times = 0;
         protected override void Update(GameTime gameTime) {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
             //---Game Logic---//
             switch(GameSt) {
                 case GameState.Normal:
-                    er.Update(gameTime);
+                    area.Update(gameTime);
                     Physics.Update();
-                    er.PostUpdate(gameTime);
+                    area.PostUpdate(gameTime);
                     Eng.Update(gameTime);
                     break;
                 case GameState.Inventory:
-                    var player = (Player)ERegistry.GetEntity<Player>();
+                    var player = (Player)Area.GetEntity<Player>();
                     player.inventory.Update();
                     Input.Update();
                     break;
@@ -89,13 +91,12 @@ namespace Suvival_RPG {
             //---Drawing---//
             switch(GameSt) {
                 case GameState.Normal:
-                    tm.Draw(spriteBatch, TileMap);
-                    er.Draw(spriteBatch, Eng.pxlsize, Eng.tilesize, Color.White);
+                    area.Draw(spriteBatch, Eng.pxlsize, Eng.tilesize, Color.White, tilemap);
                     foreach (Text text in Texts)
                         text.Draw(spriteBatch);
                     break;
                 case GameState.Inventory:
-                    var player = (Player)ERegistry.GetEntity<Player>();
+                    var player = (Player)Area.GetEntity<Player>();
                     player.inventory.Draw(spriteBatch);
                     break;
             }
@@ -103,6 +104,15 @@ namespace Suvival_RPG {
             //---Drawing---//
 
             base.Draw(gameTime);
+        }
+
+        public static void LoadRoom(int id) {
+            foreach(Entity e in Area.entities) {
+                e.Enabled = false;
+            }
+            Room room = rooms[id];
+            room.SetEnabledAllEntities(true);
+            area.tm = new Tilemap(room.tiles);
         }
     }
 }

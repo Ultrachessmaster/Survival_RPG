@@ -18,6 +18,12 @@ namespace Engine
             Tiles = new ITile[width, height];
         }
 
+        public Tilemap(ITile[,] tiles) {
+            Tiles = tiles;
+            Width = tiles.GetUpperBound(0) + 1;
+            Height = tiles.GetUpperBound(1) + 1;
+        }
+
         public void Draw(SpriteBatch sb, Texture2D texturemap) {
             for(int x = 0; x < Width; x++) {
                 for(int y = 0; y < Height; y++) {

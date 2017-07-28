@@ -66,10 +66,6 @@ public static class Physics {
             hitbox.pos += nextvelocity;
             hitbox.vel = nextvelocity;
             hitbox.UpdatePolygon();
-
-            if(hitbox.entity is Player) {
-                int x = 0;
-            }
         }
     }
 	public static void AddCollider(HitBox c) {

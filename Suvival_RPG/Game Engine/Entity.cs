@@ -22,7 +22,19 @@ namespace Engine
         public virtual Vector2 pos { get; set; }
         public Vector2 scale = new Vector2(1, 1);
         public float rotation = 0f;
-        public bool enabled = true;
+        public virtual bool Enabled {
+            get {
+                return enabled;
+            }
+            set {
+                enabled = value;
+                if (hitbox != null)
+                    hitbox.enabled = false;
+            }
+        }
+        bool enabled;
+
+        public HitBox hitbox;
         
         public string Tag { get { return tag; } }
         protected string tag = "";
@@ -38,7 +50,7 @@ namespace Engine
 
         public virtual void Draw (SpriteBatch sb, int pxlratio, int tilesize, Color col)
         {
-            if (enabled && visible)
+            if (Enabled && visible)
             {
                 int xsource = (Sprite % (tex.Width / tilesize)) * tilesize;
                 int ysource = (int)Math.Floor((decimal)(Sprite) / (tex.Height / tilesize)) * tilesize;

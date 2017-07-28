@@ -16,33 +16,27 @@ namespace Suvival_RPG {
         Text hungertext;
         Text XPtext;
 
-        HitBox hb;
-
         public Inventory inventory = new Inventory();
 
         bool invincible = false;
-
         float speed = 1f;
 
         PlayerState ps = PlayerState.Normal;
 
         public const float swordWaitTIme = 0.25f;
         public const float rollTime = 0.125f;
-
         SoundEffect hit;
-
         Vector2 swordoffset = new Vector2(0, 32);
 
         public Player (Vector2 pos) {
             this.pos = pos;
-
             Sprite = 0;
             tex = SRPG.SpriteMap;
 
             Health = 50;
             Hunger = 100;
 
-            hb = new HitBox(pos, new Vector2(4f, 10f), this);
+            hitbox = new HitBox(pos, new Vector2(4f, 10f), this);
 
             hit = SRPG.CM.Load<SoundEffect>("hit audio 2");
 
@@ -57,10 +51,10 @@ namespace Suvival_RPG {
         }
 
         public override void Update(GameTime gt) {
-            Assert.AreEqual(pos, hb.pos);
+            Assert.AreEqual(pos, hitbox.pos);
             switch(ps) {
                 case PlayerState.Normal:
-                    var vel = hb.vel;
+                    var vel = hitbox.vel;
                     if (Input.IsKeyDown(Keys.Up))
                         vel.Y = -speed;
                     if (Input.IsKeyDown(Keys.Down))
@@ -69,14 +63,14 @@ namespace Suvival_RPG {
                         vel.X = -speed;
                     if (Input.IsKeyDown(Keys.Right))
                         vel.X = speed;
-                    hb.vel = vel;
+                    hitbox.vel = vel;
                     var offset = new Vector2(Math.Sign(vel.X), Math.Sign(vel.Y));
                     if (offset != Vector2.Zero)
                         swordoffset = offset * Eng.tilesize / 2;
                     if(Input.IsKeyPressed(Keys.X)) {
                         if(offset != Vector2.Zero) {
                             ps = PlayerState.Rolling;
-                            hb.vel *= 7;
+                            hitbox.vel *= 7;
                             Timer.AddTimer(() => ps = PlayerState.Normal, rollTime, this);
                         }
                     }
@@ -84,7 +78,7 @@ namespace Suvival_RPG {
                         var correctedoffset = new Vector2(swordoffset.X, -swordoffset.Y);
                         Sword s = new Sword(pos + swordoffset, gt, correctedoffset.Angle(-Vector2.UnitX));
 
-                        ERegistry.AddEntity(s);
+                        Area.AddEntity(s);
 
                         ps = PlayerState.Frozen;
                         Timer.AddTimer(() => ps = PlayerState.Normal, swordWaitTIme, this);
@@ -99,7 +93,7 @@ namespace Suvival_RPG {
                 Health -= 0.001f;
 
             if (Health <= 0)
-                ERegistry.RemoveEntity(this);
+                Area.RemoveEntity(this);
         }
 
         void GetItems() {
@@ -107,14 +101,14 @@ namespace Suvival_RPG {
             foreach(HitBox hit in foods) {
                 Food f = (Food)hit.entity;
                 inventory.AddFood(f);
-                ERegistry.RemoveEntity(f);
+                Area.RemoveEntity(f);
             }
 
             var weapons = Physics.GetCollisions<IWeapon>(hb, true);
             foreach (HitBox hit in weapons) {
                 IWeapon w = (IWeapon)hit.entity;
                 inventory.AddWeapon(w);
-                ERegistry.RemoveEntity(hit.entity);
+                Area.RemoveEntity(hit.entity);
             }*/
         }
 
@@ -131,25 +125,25 @@ namespace Suvival_RPG {
         public override void PostUpdate() {
             switch(ps) {
                 case PlayerState.Rolling:
-                    pos = hb.pos;
+                    pos = hitbox.pos;
                     break;
                 default:
-                    hb.vel = Vector2.Zero;
-                    pos = hb.pos;
+                    hitbox.vel = Vector2.Zero;
+                    pos = hitbox.pos;
                     break;
             }
             UpdateText();
             Camera.X = (int)pos.X - (7 * Eng.tilesize);
             Camera.Y = (int)pos.Y - (6 * Eng.tilesize);
 
-            foreach(Entity e in ERegistry.entities) {
+            foreach(Entity e in Area.entities) {
                 if (e is Kobolt) {
                     if (Vector2.Distance(e.pos, pos) < 15 * Eng.tilesize) {
-                        e.enabled = true;
-                        (e as Kobolt).body.enabled = true;
+                        e.Enabled = true;
+                        (e as Kobolt).hitbox.enabled = true;
                     } else {
-                        e.enabled = false;
-                        (e as Kobolt).body.enabled = false;
+                        e.Enabled = false;
+                        (e as Kobolt).hitbox.enabled = false;
                     }
                 }
                 

@@ -13,20 +13,18 @@ namespace Suvival_RPG {
 
             set {
                 base.pos = value;
-                body.pos = value;
+                hitbox.pos = value;
             }
         }
 
         public float Health { get; private set; }
         bool invincible = false;
 
-        public HitBox body;
-
         float noticedistance = 9f * Eng.tilesize;
         float speed = 0.5f;
 
         public Kobolt(Vector2 pos) {
-            body = new HitBox(pos, new Vector2(4f, 10f), this);
+            hitbox = new HitBox(pos, new Vector2(4f, 10f), this);
             this.pos = pos;
             Sprite = 1;
             tex = SRPG.SpriteMap;
@@ -34,30 +32,30 @@ namespace Suvival_RPG {
         }
 
         public override void Update(GameTime gt) {
-            var player = ERegistry.GetEntity<Player>();
+            var player = Area.GetEntity<Player>();
             if(player != null && Vector2.Distance(player.pos, pos) < noticedistance && !invincible) {
                 var dir = player.pos - pos;
                 dir.Normalize();
-                body.vel = dir * speed;
+                hitbox.vel = dir * speed;
             }
             if (Health <= 0) {
-                ERegistry.RemoveEntity(this);
-                Physics.RemoveCollider(body);
+                Area.RemoveEntity(this);
+                Physics.RemoveCollider(hitbox);
                 if(Rng.r.Next(0, 4) == 0)
-                    ERegistry.AddEntity(new Food(pos, FoodType.Kobolt_Meat));
+                    Area.AddEntity(new Food(pos, FoodType.Kobolt_Meat));
 
                 Player.XP += 10;
             }
         }
 
         public override void PostUpdate() {
-            body.vel = Vector2.Zero;
-            pos = body.pos;
-            body.size += new Vector2(2, 2);
-            body.UpdatePolygon();
-            var playerbody = Physics.GetCollision<Player>(body);
-            body.size -= new Vector2(2, 2);
-            body.UpdatePolygon();
+            hitbox.vel = Vector2.Zero;
+            pos = hitbox.pos;
+            hitbox.size += new Vector2(2, 2);
+            hitbox.UpdatePolygon();
+            var playerbody = Physics.GetCollision<Player>(hitbox);
+            hitbox.size -= new Vector2(2, 2);
+            hitbox.UpdatePolygon();
             if(playerbody != null) {
                 var player = (Player)playerbody.entity;
                 player.Damage(5f);

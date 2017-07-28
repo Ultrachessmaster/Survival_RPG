@@ -24,7 +24,7 @@ namespace Engine
             timepassed += timepass;
             if (timepassed >= time)
             {
-                if(ERegistry.entities.Contains(e))
+                if(Area.entities.Contains(e))
                     action.Invoke();
                 Eng.Timers.Remove(this);
             }

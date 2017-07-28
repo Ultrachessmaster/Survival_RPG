@@ -5,82 +5,59 @@ using System.Collections.Generic;
 
 namespace Suvival_RPG {
     class Generator {
-        public Generator() {
-            
-        }
+        public const int RoomMapSize = 41;
+        public static XY Start = new XY(RoomMapSize / 2, RoomMapSize / 2);
 
-        public Tilemap GenerateFloor() {
-            var roommapsize = 21;
-            Tilemap tm = new Tilemap(roommapsize * Room.MaxRoomSize, roommapsize * Room.MaxRoomSize);
+        public List<Room> GenerateFloor() {
+            bool[,] roommap = new bool[RoomMapSize, RoomMapSize];
+            XY current = Start;
+            roommap[Start.X, Start.Y] = true;
+            List<XY> rpos = new List<XY>();
+            for(int i = 0; i < 20; i++) {
+                Action<XY> AssignRoom = (XY direc) => {
+                    current += direc;
+                    roommap[current.X, current.Y] = true;
+                    rpos.Add(current);
+                };
 
-            XY start = new XY(roommapsize * Room.MaxRoomSize / 2, roommapsize * Room.MaxRoomSize / 2);
-            var mainpath = MakePath(start, tm, 20);
+                XY dir = RandomDirection();
+                XY newpos = current + dir;
 
-            ERegistry.AddEntity(new Player(new Vector2(roommapsize * Room.MaxRoomSize * Eng.tilesize / 2)));
-
-            foreach (Room r in mainpath) {
-                r.PlaceEnemies();
+                if (!roommap[newpos.X, newpos.Y]) {
+                    roommap[newpos.X, newpos.Y] = true;
+                    current = newpos;
+                    rpos.Add(current);
+                } else if(!roommap[current.X + 1, current.Y]) {
+                    AssignRoom(XY.Right);
+                } else if(!roommap[current.X - 1, current.Y]) {
+                    AssignRoom(XY.Left);
+                } else if(!roommap[current.X, current.Y + 1]) {
+                    AssignRoom(XY.Up);
+                } else if(!roommap[current.X, current.Y - 1]) {
+                    AssignRoom(XY.Down);
+                } else {
+                    roommap = new bool[RoomMapSize, RoomMapSize];
+                    roommap[Start.X, Start.Y] = true;
+                    current = Start;
+                    rpos.Clear();
+                    i = -1;
+                }
+            }
+            List<Room> rooms = new List<Room>();
+            for(int i = 1; i < rpos.Count - 1; i++) {
+                Room r = new Room(rpos[i] - rpos[i - 1], rpos[i + 1] - rpos[i], i - 1);
+                r.roompos = rpos[i];
                 foreach(Entity e in r.entities) {
-                    e.pos += new Vector2(r.roombeg.X * Eng.tilesize, r.roombeg.Y * Eng.tilesize);
+                    e.Enabled = false;
                 }
-                ERegistry.AddRangeE(r.entities);
-            }
-
-            for(int x = 0; x < tm.Width; x++) {
-                for (int y = 0; y < tm.Height; y++) {
-                    if (tm[x, y] is ISolid) {
-                        HitBox hb = new HitBox(new Vector2(x * Eng.tilesize, y * Eng.tilesize), Vector2.One * Eng.tilesize, null);
-                        hb.kinematic = true;
-                        hb.offset = new Vector2(8f, 8f);
-                    }
-                        
-                }
-            }
-
-            return tm;
-        }
-
-        public List<Room> MakePath(XY start, Tilemap tm, int length) {
-            var prevexitglobal = start;
-            var prevexitdirection = RandomDirection();
-            var rooms = new List<Room>();
-            int fails = 0;
-            for (int i = 0; i < length; i++) {
-                var roomfit = true;
-                Room r = new Room(prevexitdirection);
-                XY roombeg = prevexitglobal - r.entry;
-                for (int x = roombeg.X + 1; x < r.Width + roombeg.X - 1; x++) {
-                    for (int y = roombeg.Y + 1; y < r.Height + roombeg.Y - 1; y++) {
-                        if (tm[x, y] != null)
-                            roomfit = false;
-                    }
-                }
-                if (!roomfit) {
-                    fails++;
-                    i--;
-                    if (fails >= 5) {
-                        fails = 0;
-                        i = -1;
-                        prevexitglobal = start;
-                        prevexitdirection = RandomDirection();
-                        tm = new Tilemap(tm.Width, tm.Height);
-                        rooms.Clear();
-                    }
-                    continue;
-                }
-
-                for (int x = roombeg.X; x < r.Width + roombeg.X; x++) {
-                    for (int y = roombeg.Y; y < r.Height + roombeg.Y; y++) {
-                        tm[x, y] = r.tiles[x - roombeg.X, y - roombeg.Y];
-                    }
-                }
-
-                r.roombeg = roombeg;
+                Area.AddRangeE(r.entities);
                 rooms.Add(r);
-
-                prevexitglobal += (r.exit - r.entry);
-                prevexitdirection = r.exitdirection;
             }
+
+            XY playerpos = rooms[0].entry;
+            Player p = new Player(new Vector2((playerpos.X + 2) * Eng.tilesize, playerpos.Y * Eng.tilesize));
+            rooms[0].AddEntity(p);
+            Area.AddEntity(p);
             return rooms;
         }
 
@@ -110,35 +87,43 @@ namespace Suvival_RPG {
         public XY exitdirection;
         public XY exit;
 
-        public XY roombeg;
+        public XY roompos;
 
-        public const int MaxRoomSize = 15;
+        public const int MaxRoomSize = 25;
 
         public int Width { get; private set; }
         public int Height { get; private set; }
         public ITile[,] tiles;
 
         public List<Entity> entities = new List<Entity>();
-        public Room(XY prevexitdir) {
 
-            Width = Rng.r.Next(5, MaxRoomSize);
-            Height = Rng.r.Next(5, MaxRoomSize);
+        XY prevexitdir;
+        XY exitdir;
+        public Room(XY prevexitdir, XY exitdir, int id) {
+            this.prevexitdir = prevexitdir;
+            this.exitdir = exitdir;
+            Generate(id);
+        }
+
+        public void Generate(int id) {
+            Width = Rng.r.Next(10, MaxRoomSize);
+            Height = Rng.r.Next(10, MaxRoomSize);
             tiles = new ITile[Width, Height];
             for (int x = 0; x < Width; x++) {
                 for (int y = 0; y < Height; y++) {
                     if (y == Height - 1 || y == 0 || x == Width - 1 || x == 0) {
                         tiles[x, y] = new DirtWall();
-                    } else {
+                    }
+                    else {
                         tiles[x, y] = new DirtFloor();
                     }
 
                 }
             }
 
-            
-
-            CreateEntrance(prevexitdir);
-            CreateExit();
+            CreateEntrance(prevexitdir, id);
+            CreateExit(exitdir, id);
+            PlaceEnemies();
         }
 
         public void PlaceEnemies() {
@@ -153,51 +138,75 @@ namespace Suvival_RPG {
             }
         }
 
-        void CreateEntrance(XY prevexitdir) {
+        public void AddEntity(Entity e) {
+            entities.Add(e);
+        }
+
+        void CreateEntrance(XY prevexitdir, int id) {
             if (prevexitdir == XY.Right) {
                 int entryrightY = Rng.r.Next(1, Height - 2);
                 tiles[0, entryrightY] = new DirtFloor();
                 entry = new XY(0, entryrightY);
+                Vector2 doorpos = new Vector2(entry.X * Eng.tilesize, entry.Y * Eng.tilesize);
+                entities.Add(new Door(doorpos, id + 1));
             }
             else if (prevexitdir == XY.Left) {
                 int entryleftY = Rng.r.Next(1, Height - 2);
                 tiles[Width - 1, entryleftY] = new DirtFloor();
                 entry = new XY(Width - 1, entryleftY);
+                Vector2 doorpos = new Vector2(entry.X * Eng.tilesize, entry.Y * Eng.tilesize);
+                entities.Add(new Door(doorpos, id + 1));
             }
             else if (prevexitdir == XY.Up) {
                 int entryupX = Rng.r.Next(1, Width - 2);
                 tiles[entryupX, 0] = new DirtFloor();
                 entry = new XY(entryupX, 0);
+                Vector2 doorpos = new Vector2(entry.X * Eng.tilesize, entry.Y * Eng.tilesize);
+                entities.Add(new Door(doorpos, id + 1));
             }
             else if (prevexitdir == XY.Down) {
                 int entrydownX = Rng.r.Next(1, Width - 2);
                 tiles[entrydownX, Height - 1] = new DirtFloor();
                 entry = new XY(entrydownX, Height - 1);
+                Vector2 doorpos = new Vector2(entry.X * Eng.tilesize, entry.Y * Eng.tilesize);
+                entities.Add(new Door(doorpos, id + 1));
             }
         }
 
-        void CreateExit() {
-            exitdirection = Generator.RandomDirection();
-
+        void CreateExit(XY exitdirection, int id) {
             if (exitdirection == XY.Right) {
                 int exitrightY = Rng.r.Next(1, Height - 2);
                 tiles[Width - 1, exitrightY] = new DirtFloor();
                 exit = new XY(Width - 1, exitrightY);
+                Vector2 doorpos = new Vector2(exit.X * Eng.tilesize, exit.Y * Eng.tilesize);
+                entities.Add(new Door(doorpos, id));
             }
             else if (exitdirection == XY.Left) {
                 int exitleftY = Rng.r.Next(1, Height - 2);
                 tiles[0, exitleftY] = new DirtFloor();
                 exit = new XY(0, exitleftY);
+                Vector2 doorpos = new Vector2(exit.X * Eng.tilesize, exit.Y * Eng.tilesize);
+                entities.Add(new Door(doorpos, id));
             }
             else if (exitdirection == XY.Up) {
                 int exitupX = Rng.r.Next(1, Width - 2);
                 tiles[exitupX, Height - 1] = new DirtFloor();
                 exit = new XY(exitupX, Height - 1);
+                Vector2 doorpos = new Vector2(exit.X * Eng.tilesize, exit.Y * Eng.tilesize);
+                entities.Add(new Door(doorpos, id));
             }
             else if (exitdirection == XY.Down) {
                 int exitupX = Rng.r.Next(1, Width - 2);
                 tiles[exitupX, 0] = new DirtFloor();
                 exit = new XY(exitupX, 0);
+                Vector2 doorpos = new Vector2(exit.X * Eng.tilesize, exit.Y * Eng.tilesize);
+                entities.Add(new Door(doorpos, id));
+            }
+        }
+
+        public void SetEnabledAllEntities(bool enabled) {
+            foreach(Entity e in entities) {
+                e.Enabled = enabled;
             }
         }
 

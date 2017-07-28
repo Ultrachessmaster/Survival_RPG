@@ -57,7 +57,7 @@ public class HitBox {
 	}
 		
 	float Angle (Vector2 off) {
-        var offy = System.Math.Sign(off.Y);
+        var offy = Math.Sign(off.Y);
         off.Normalize();
         //((offy == -1 ? -Vec2.Angle(Vector2.UnitX, off)
         //    : Vec2.Angle(Vector2.UnitX, off))

@@ -9,15 +9,13 @@ namespace Suvival_RPG {
         public float Attack { get; private set; }
         public string Name { get; private set; }
 
-        HitBox body;
-
         public Sword(Vector2 pos, GameTime gt, float rotation) {
             this.pos = pos;
             Sprite = 2;
             tex = SRPG.SpriteMap;
-            body = new HitBox(pos, Vector2.One, this);
+            hitbox = new HitBox(pos, Vector2.One, this);
             Vector2 f = new Vector2(13f / Eng.tilesize, 5f / Eng.tilesize);
-            body.rotation = rotation;
+            hitbox.rotation = rotation;
             this.rotation = rotation;
             Timer.AddTimer(DestroySelf, Player.swordWaitTIme, this);
 
@@ -26,7 +24,7 @@ namespace Suvival_RPG {
         }
 
         public override void PostUpdate() {
-            var damagecols = Physics.GetCollisions<IDamagable>(body);
+            var damagecols = Physics.GetCollisions<IDamagable>(hitbox);
             foreach(HitBox col in damagecols) {
                 var dmg = (IDamagable)col.entity;
                 if(dmg is Player)
@@ -37,8 +35,8 @@ namespace Suvival_RPG {
         }
 
         void DestroySelf() {
-            ERegistry.RemoveEntity(this);
-            Physics.RemoveCollider(body);
+            Area.RemoveEntity(this);
+            Physics.RemoveCollider(hitbox);
         }
     }
 }

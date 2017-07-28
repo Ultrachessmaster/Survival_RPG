@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Engine {
-    class XY {
+    public class XY {
         public int X;
         public int Y;
 
